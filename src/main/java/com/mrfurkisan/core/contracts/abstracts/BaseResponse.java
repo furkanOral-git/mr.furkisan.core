@@ -1,22 +1,18 @@
 package com.mrfurkisan.core.contracts.abstracts;
 
-import org.springframework.http.HttpStatusCode;
+import java.io.Serializable;
 
-public abstract class BaseResponse {
+public abstract class BaseResponse implements Serializable {
     
-    private HttpStatusCode __statusCode;
+    
     private String __message;
     private Boolean __success;
 
-    public BaseResponse(HttpStatusCode statusCode, Boolean success, String message) {
+    public BaseResponse( Boolean success, String message) {
         super();
-        this.__statusCode = statusCode;
+        
         this.__success = success;
         this.__message = message;
-    }
-
-    public HttpStatusCode GetStatusCode() {
-        return this.__statusCode;
     }
 
     public String GetMessage() {
@@ -26,4 +22,5 @@ public abstract class BaseResponse {
     public Boolean GetSuccess() {
         return this.__success;
     }
+    
 }

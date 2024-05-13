@@ -10,9 +10,16 @@ import com.mrfurkisan.core.security.authentication.SecurityTokenEntity;
 import com.mrfurkisan.core.security.authentication.User;
 
 public final class TokenService<TRepository extends ITokenRepository> implements ITokenService {
+    
+    private TRepository __repository;
 
+    public TokenService(TRepository repository) {
+        super();
+        this.__repository = repository;
+    }
     @Override
     public BaseDataResponse<SecurityToken> CreateToken(User user) {
+        
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'CreateToken'");
     }

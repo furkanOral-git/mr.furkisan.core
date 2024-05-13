@@ -21,6 +21,6 @@ public abstract class BaseRequest {
     public String GetVersionInfo() {
         return this.__onVersion;
     }
-
+    
     
 }

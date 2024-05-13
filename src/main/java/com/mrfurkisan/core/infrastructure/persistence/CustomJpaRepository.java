@@ -2,6 +2,7 @@ package com.mrfurkisan.core.infrastructure.persistence;
 
 import java.util.List;
 
+
 import com.mrfurkisan.core.application.repositories.IJpaRepository;
 import com.mrfurkisan.core.domain.functional.IPredicateBuilderFunctionalInterface;
 import com.mrfurkisan.core.domain.interfaces.IEntity;
@@ -17,7 +18,7 @@ public abstract class CustomJpaRepository<TEntity extends IEntity, TId> implemen
     private final Class<TEntity> __type;
     private final EntityManager __manager;
 
-    public CustomJpaRepository(EntityManager manager, Class<TEntity> type) {
+    public CustomJpaRepository(EntityManager manager ,Class<TEntity> type) {
         super();
         this.__manager = manager;
         this.__type = type;

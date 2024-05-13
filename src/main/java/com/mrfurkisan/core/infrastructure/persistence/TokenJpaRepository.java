@@ -1,5 +1,6 @@
 package com.mrfurkisan.core.infrastructure.persistence;
 
+
 import com.mrfurkisan.core.application.auth.ITokenRepository;
 import com.mrfurkisan.core.security.authentication.SecurityTokenEntity;
 
@@ -9,7 +10,6 @@ public class TokenJpaRepository extends CustomJpaRepository<SecurityTokenEntity,
 
     public TokenJpaRepository(EntityManager manager, Class<SecurityTokenEntity> type) {
         super(manager, type);
-
     }
 
 }

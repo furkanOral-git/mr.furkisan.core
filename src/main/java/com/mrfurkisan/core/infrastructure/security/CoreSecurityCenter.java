@@ -1,16 +1,18 @@
 package com.mrfurkisan.core.infrastructure.security;
 
-import com.mrfurkisan.core.application.auth.ISecurityCenter;
-import com.mrfurkisan.core.application.auth.ITokenService;
-import com.mrfurkisan.core.application.auth.IUserService;
-import com.mrfurkisan.core.application.forms.LoginForm;
-import com.mrfurkisan.core.application.forms.RegisterForm;
-import com.mrfurkisan.core.contracts.abstracts.BaseDataResponse;
-import com.mrfurkisan.core.contracts.abstracts.BaseResponse;
-import com.mrfurkisan.core.contracts.requests.FreeDataRequest;
-import com.mrfurkisan.core.contracts.requests.SecureDataRequest;
-import com.mrfurkisan.core.contracts.requests.SecureRequest;
-import com.mrfurkisan.core.security.authentication.SecurityToken;
+
+
+import org.springframework.http.HttpStatusCode;
+
+
+import com.mrfurkisan.core.application.auth.*;
+import com.mrfurkisan.core.application.forms.*;
+import com.mrfurkisan.core.contracts.abstracts.*;
+import com.mrfurkisan.core.contracts.requests.*;
+import com.mrfurkisan.core.contracts.responses.*;
+import com.mrfurkisan.core.security.authentication.*;
+
+
 
 public final class CoreSecurityCenter implements ISecurityCenter {
 
@@ -25,7 +27,8 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     public BaseDataResponse<SecurityToken> Verify(FreeDataRequest<LoginForm> loginReq) {
         
-        return null;
+        var token = new SecurityToken("uniqueId");
+        return new SuccessDataResponse<SecurityToken>("Başarılı",token);
     }
 
     public BaseResponse SignIn(FreeDataRequest<RegisterForm> registerReq) {
@@ -35,8 +38,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
     @Override
     public BaseResponse Logout(SecureRequest req) {
         
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Logout'");
+        return null;
     }
 
     @Override
@@ -62,5 +64,5 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'ChangeUserName'");
     }
-
+    
 }

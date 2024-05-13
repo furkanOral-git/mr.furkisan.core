@@ -1,6 +1,5 @@
 package com.mrfurkisan.core.security.authentication;
 
-import com.mrfurkisan.core.domain.interfaces.IEntity;
 
 import jakarta.persistence.Id;
 
