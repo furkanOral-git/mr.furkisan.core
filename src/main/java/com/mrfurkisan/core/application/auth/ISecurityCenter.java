@@ -20,8 +20,6 @@ public interface ISecurityCenter extends IApplicationServiceCenter {
 
     public BaseResponse Logout(SecureRequest req);
 
-    public BaseResponse ValidateToken(SecureRequest req);
-
     public BaseResponse ChangePassword(SecureDataRequest<String> req);
 
     public BaseResponse ChangeEmail(SecureDataRequest<String> req);

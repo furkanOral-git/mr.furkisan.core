@@ -33,12 +33,9 @@ public final class TokenService<TRepository extends ITokenRepository> implements
 
     @Override
     public BaseResponse ValidateToken(SecurityToken token) {
+        
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'ValidateToken'");
     }
-
-   
-
-    
 
 }

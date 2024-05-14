@@ -11,8 +11,8 @@ public @interface Authority {
 
     AccessDimensionLevel SetAccessDimensionLevel() default AccessDimensionLevel.Authenticated;
 
-    DomainAccessLevel SetHorizontalDomainAccess() default DomainAccessLevel.Public;
+    DomainAccessLevel SetDomainAccess() default DomainAccessLevel.Public;
 
-    String SetDomainName();
+    DomainName[] SetDomainName() default DomainName.USER;
 
 }

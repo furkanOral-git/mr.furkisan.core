@@ -1,7 +1,7 @@
 package com.mrfurkisan.core.domain.interfaces;
 
-import com.mrfurkisan.core.domain.functional.IVoidAccumulatorFunctionalInterface;
-import com.mrfurkisan.core.domain.functional.IVoidLambdaFunctionalInterface;
+import com.mrfurkisan.core.domain.functional.IFunctionalInterface;
+import com.mrfurkisan.core.domain.functional.IVoidFunctionalInterface;
 
 //Agrege kök, varlıkları kendi içerisinde barındıran ve sadece kendisinin kapsadığı varlıklarla ilgilenen
 //Domain Driven Design'ın önemli bir parçasıdır. Örn: Bir Sepet Domaininde sepetle alakalı varlık: CartItem olurken, Cart bir agrege kökdür.
@@ -14,15 +14,8 @@ public interface IAggregateRoot<TEntity extends IEntity, TId> {
     public void RemoveFromRoot(TEntity entity);
 
     // Her bir nesne için callback fonksiyonunu çalıştırmasını sağlar.
-    public void ForEach(IVoidLambdaFunctionalInterface<TEntity> callBack);
+    public void ForEach(IVoidFunctionalInterface<TEntity> callBack);
 
-    // Javascript içerisindeki accümülator yapısının aggregate rootlara eklenmesi.
-    // Örneğin bir cart'taki ürünlerin
-    // toplam fiyatını recursive şekilde eklemek için bu fonksiyon kullanılabilir.
-    // TReturnType Accumulate fonksiyonuna parametre olarak gönderilen Lambda
-    // fonksiyonu içerisindeki toplayıcıyı temsil eder temsil eder.
-    // Cart senaryosunda integer bir değer olacak ve her adımda entity.Price
-    // özelliğini accümülator'a ekleyebilmemizi sağlayacaktır.
-    public <TReturnType extends IBaseValueObject> TReturnType Accumulate(
-            IVoidAccumulatorFunctionalInterface<TEntity, TReturnType> callBack, TReturnType accumulator);
+    
+   
 }

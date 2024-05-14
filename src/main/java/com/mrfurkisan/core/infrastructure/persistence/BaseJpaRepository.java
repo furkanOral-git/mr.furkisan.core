@@ -2,9 +2,8 @@ package com.mrfurkisan.core.infrastructure.persistence;
 
 import java.util.List;
 
-
 import com.mrfurkisan.core.application.repositories.IJpaRepository;
-import com.mrfurkisan.core.domain.functional.IPredicateBuilderFunctionalInterface;
+import com.mrfurkisan.core.domain.functional.IFunctionalInterface;
 import com.mrfurkisan.core.domain.interfaces.IEntity;
 
 import jakarta.persistence.EntityManager;
@@ -13,12 +12,12 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-public abstract class CustomJpaRepository<TEntity extends IEntity, TId> implements IJpaRepository<TEntity, TId> {
+public abstract class BaseJpaRepository<TEntity extends IEntity, TId> implements IJpaRepository<TEntity, TId> {
 
     private final Class<TEntity> __type;
     private final EntityManager __manager;
 
-    public CustomJpaRepository(EntityManager manager ,Class<TEntity> type) {
+    public BaseJpaRepository(EntityManager manager, Class<TEntity> type) {
         super();
         this.__manager = manager;
         this.__type = type;
@@ -48,16 +47,16 @@ public abstract class CustomJpaRepository<TEntity extends IEntity, TId> implemen
         }
     }
 
-    public TEntity GetById(TId id) {
+    public <TContext> TEntity GetBy(IFunctionalInterface<TEntity, TContext> pre) {
 
         if (this.__manager.isOpen()) {
-
-            return this.__manager.find(this.__type, id);
+            //Yeniden yazılacak!
+            return null;
         }
         return null;
     }
 
-    public List<TEntity> GetByPredicate(IPredicateBuilderFunctionalInterface<TEntity> pre) {
+    public <TContext> List<TEntity> GetAllBy(IFunctionalInterface<TEntity, TContext> pre) {
 
         if (this.__manager.isOpen()) {
 
@@ -73,7 +72,7 @@ public abstract class CustomJpaRepository<TEntity extends IEntity, TId> implemen
 
             // Veritabanına attığımız sorgu. FunctionalInterface'ler ile sardık ve servis
             // metodları içerisinde sorgumuzu atacağız.
-            Predicate predicate = pre.buildPredicate(builder, table);
+            Predicate predicate = (Predicate)pre.build(builder, table);
             // Şart where fonksiyonu ile sorgumuza eklendi.
             query.where(predicate);
             return this.__manager.createQuery(query).getResultList();

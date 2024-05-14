@@ -4,7 +4,7 @@ import com.mrfurkisan.core.domain.BaseEntity;
 import jakarta.persistence.Id;
 
 //@Entity: IEntity üzerinde tanımladığımız için ve @inheritance ile miras yolunu da açtığımız için gerek yok.
-public final class User extends BaseEntity {
+public final class User extends BaseEntity<Number> {
 
     @Id
     private int __userId;
@@ -27,7 +27,7 @@ public final class User extends BaseEntity {
         return this.__roleId;
     }
 
-    public int GetUserId() {
+    public Number GetId() {
         return this.__userId;
     }
 

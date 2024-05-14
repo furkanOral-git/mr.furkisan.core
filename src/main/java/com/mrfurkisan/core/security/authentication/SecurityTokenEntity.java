@@ -1,12 +1,14 @@
 package com.mrfurkisan.core.security.authentication;
 
+import com.mrfurkisan.core.domain.BaseEntity;
 
 import jakarta.persistence.Id;
 
 // Veritabanında tutulan nesne. Hiçbir şekilde Client tarafına gitmeycek. Oturum
 // sonlandırıldığında
 // Veritabanından silinecek.
-public class SecurityTokenEntity implements ISecurityTokenEntity {
+public class SecurityTokenEntity extends BaseEntity<String> implements ISecurityTokenEntity {
+    
     @Id
     private String __uniqueId;
     private String __macAddress;
@@ -27,11 +29,8 @@ public class SecurityTokenEntity implements ISecurityTokenEntity {
     }
 
     @Override
-    public String GetCurrentSecurityToken() {
+    public String GetId() {
         return this.__uniqueId;
     }
 
-   
-
-   
 }

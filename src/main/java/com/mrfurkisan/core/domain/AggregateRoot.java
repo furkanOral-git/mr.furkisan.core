@@ -2,10 +2,11 @@ package com.mrfurkisan.core.domain;
 
 import java.util.ArrayList;
 
-import com.mrfurkisan.core.domain.functional.IVoidAccumulatorFunctionalInterface;
-import com.mrfurkisan.core.domain.functional.IVoidLambdaFunctionalInterface;
+
+import com.mrfurkisan.core.domain.functional.IVoidFunctionalInterface;
+
 import com.mrfurkisan.core.domain.interfaces.IAggregateRoot;
-import com.mrfurkisan.core.domain.interfaces.IBaseValueObject;
+
 import com.mrfurkisan.core.domain.interfaces.IEntity;
 
 public abstract class AggregateRoot<TEntity extends IEntity, TId> implements IAggregateRoot<TEntity, TId> {
@@ -27,11 +28,11 @@ public abstract class AggregateRoot<TEntity extends IEntity, TId> implements IAg
     }
 
     @Override
-    public void ForEach(IVoidLambdaFunctionalInterface<TEntity> callBack) {
+    public void ForEach(IVoidFunctionalInterface<TEntity> callBack) {
 
         for (TEntity tEntity : this.__aggregate) {
 
-            callBack.run(tEntity);
+            callBack.build(tEntity);
         }
 
     }
@@ -42,14 +43,6 @@ public abstract class AggregateRoot<TEntity extends IEntity, TId> implements IAg
         this.__aggregate.remove(entity);
     }
 
-    @Override
-    public <TReturnType extends IBaseValueObject> TReturnType Accumulate(
-            IVoidAccumulatorFunctionalInterface<TEntity, TReturnType> callBack, TReturnType accumulator) {
-
-        for (TEntity tEntity : this.__aggregate) {
-            callBack.run(tEntity, accumulator);
-        }
-        return accumulator;
-    }
+    
 
 }

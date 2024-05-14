@@ -8,6 +8,7 @@ import jakarta.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class BaseEntity implements IEntity {
-
+public abstract class BaseEntity<TId> implements IEntity {
+    
+    public abstract TId GetId();
 }

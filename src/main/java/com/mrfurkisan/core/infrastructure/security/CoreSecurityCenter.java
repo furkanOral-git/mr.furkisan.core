@@ -1,10 +1,5 @@
 package com.mrfurkisan.core.infrastructure.security;
 
-
-
-import org.springframework.http.HttpStatusCode;
-
-
 import com.mrfurkisan.core.application.auth.*;
 import com.mrfurkisan.core.application.forms.*;
 import com.mrfurkisan.core.contracts.abstracts.*;
@@ -18,13 +13,21 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     private final ITokenService __tokenService;
     private final IUserService __userService;
+    private static CoreSecurityCenter __instance;
 
-    public CoreSecurityCenter(ITokenService tokenService, IUserService userService) {
+    private CoreSecurityCenter(ITokenService tokenService, IUserService userService) {
         super();
         this.__userService = userService;
         this.__tokenService = tokenService;
     }
-
+    public final static CoreSecurityCenter GetSecurity(ITokenService tokenService, IUserService userService){
+        
+        if(__instance == null){
+            
+            __instance = new CoreSecurityCenter(tokenService, userService);
+        }
+        return __instance;
+    }
     public BaseDataResponse<SecurityToken> Verify(FreeDataRequest<LoginForm> loginReq) {
         
         var token = new SecurityToken("uniqueId");
@@ -39,12 +42,6 @@ public final class CoreSecurityCenter implements ISecurityCenter {
     public BaseResponse Logout(SecureRequest req) {
         
         return null;
-    }
-
-    @Override
-    public BaseResponse ValidateToken(SecureRequest req) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ValidateToken'");
     }
 
     @Override
