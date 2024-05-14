@@ -2,6 +2,8 @@ package com.mrfurkisan.core.infrastructure.security;
 
 import com.mrfurkisan.core.security.authorization.AccessDimensionLevel;
 import com.mrfurkisan.core.security.authorization.AccessLevel;
+import com.mrfurkisan.core.security.authorization.Authority;
+import com.mrfurkisan.core.security.authorization.AuthorityDetails;
 
 final class CoreSecurityLogicService {
 
@@ -62,6 +64,51 @@ final class CoreSecurityLogicService {
             result = true;
         }
         return result;
+
+    }
+
+    public static AuthorityDetails CheckAuthorityAnnotations() {
+
+        /*
+         * C# taki getFrames() methodu yerine kullanılabilecek yöntem. Controller'dan
+         * istek
+         * geldiğinde bu kod bloğuna kadar olan adımları(Frame'leri) izleyerek
+         * Controller sınıf üzerindeki
+         * annotation'ın ayarlarına ulaşarak bir AuthorityDetails nesnesi oluşturacak.
+         */
+        var stackTraces = Thread.currentThread().getStackTrace();
+        
+        Authority classLevelAnnotation = null;
+        Authority methodlevelAnnotation = null;
+
+        for (StackTraceElement element : stackTraces) {
+
+            var className = element.getClassName();
+
+            /*
+             * Bu bloğa kadar olan sınıfların isimlerini alıp, bunları bütün harfleri küçük
+             * olacak şekile getirip, içerisinde controller kelimesi var mı kontrol
+             * ediyorum.
+             */
+
+            if (!className.toLowerCase().contains("controller")) {
+                continue;
+            }
+            var methodName = element.getMethodName();
+            var clss = element.getClass();
+            // class seviyesindeki annotation kontrolü için
+            classLevelAnnotation = clss.getAnnotation(Authority.class);
+            methodlevelAnnotation = null;
+            for (var method : clss.getDeclaredMethods()) {
+
+                if (method.getName() == methodName) {
+                    methodlevelAnnotation = method.getAnnotation(Authority.class);
+                    break;
+                }
+            }
+            break;
+        }
+        return new AuthorityDetails(classLevelAnnotation, methodlevelAnnotation);
 
     }
 }

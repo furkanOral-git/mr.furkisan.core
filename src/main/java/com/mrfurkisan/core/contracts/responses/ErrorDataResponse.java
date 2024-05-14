@@ -5,7 +5,7 @@ import com.mrfurkisan.core.contracts.abstracts.BaseDataResponse;
 
 public class ErrorDataResponse<TData> extends BaseDataResponse<TData> {
 
-    public ErrorDataResponse(String message, TData data) {
+    public ErrorDataResponse(String message) {
         
         super( false, message, null);
     }

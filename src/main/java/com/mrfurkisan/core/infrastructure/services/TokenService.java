@@ -5,6 +5,7 @@ import com.mrfurkisan.core.application.auth.ITokenRepository;
 import com.mrfurkisan.core.application.auth.ITokenService;
 import com.mrfurkisan.core.contracts.abstracts.BaseDataResponse;
 import com.mrfurkisan.core.contracts.abstracts.BaseResponse;
+import com.mrfurkisan.core.security.authentication.ISecurityToken;
 import com.mrfurkisan.core.security.authentication.SecurityToken;
 import com.mrfurkisan.core.security.authentication.SecurityTokenEntity;
 import com.mrfurkisan.core.security.authentication.User;
@@ -17,25 +18,25 @@ public final class TokenService<TRepository extends ITokenRepository> implements
         super();
         this.__repository = repository;
     }
+    
     @Override
-    public BaseDataResponse<SecurityToken> CreateToken(User user) {
-        
+    public SecurityTokenEntity GetTokenById(ISecurityToken token) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'GetTokenById'");
+    }
+
+
+    @Override
+    public SecurityToken CreateToken(User user) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'CreateToken'");
     }
 
-    @Override
-    public BaseResponse DeleteToken(SecurityTokenEntity tokenEntity) {
-        
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'DeleteToken'");
-    }
 
     @Override
-    public BaseResponse ValidateToken(SecurityToken token) {
-        
+    public Boolean DeleteToken(SecurityTokenEntity tokenEntity) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ValidateToken'");
+        throw new UnsupportedOperationException("Unimplemented method 'DeleteToken'");
     }
 
 }

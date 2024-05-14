@@ -8,13 +8,14 @@ import jakarta.persistence.Id;
 // sonlandırıldığında
 // Veritabanından silinecek.
 public class SecurityTokenEntity extends BaseEntity<String> implements ISecurityTokenEntity {
-    
+
     @Id
     private String __uniqueId;
     private String __macAddress;
     private int __roleId;
+    private int __userId;
 
-    SecurityTokenEntity(String uniqueId, String macAdress, int roleId) {
+    SecurityTokenEntity(String uniqueId, String macAdress, int roleId, int userId) {
         this.__uniqueId = uniqueId;
         this.__macAddress = macAdress;
         this.__roleId = roleId;
@@ -23,7 +24,9 @@ public class SecurityTokenEntity extends BaseEntity<String> implements ISecurity
     public String GetCurrentMacAddress() {
         return this.__macAddress;
     }
-
+    public int GetUserId(){
+        return this.__userId;
+    }
     public int GetRoleId() {
         return this.__roleId;
     }
