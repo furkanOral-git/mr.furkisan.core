@@ -13,7 +13,9 @@ import com.mrfurkisan.core.security.authentication.SecurityToken;
 public interface ISecurityCenter extends IApplicationServiceCenter {
 
     public BaseDataResponse<SecurityToken> Verify(FreeDataRequest<LoginForm> loginReq);
-
+    
+    public BaseResponse AuthorizationValidation(SecureRequest req);
+    
     public BaseResponse SignIn(FreeDataRequest<RegisterForm> registerReq);
 
     public BaseResponse Logout(SecureRequest req);

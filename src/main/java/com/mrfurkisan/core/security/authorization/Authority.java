@@ -9,10 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Authority {
 
-    AccessDimensionLevel SetAccessDimensionLevel() default AccessDimensionLevel.Authenticated;
+    AccessDimensionLevel AccessDimensionLevel() default AccessDimensionLevel.Authenticated;
 
-    DomainAccessLevel SetDomainAccess() default DomainAccessLevel.Public;
+    DomainAccessLevel DomainAccess() default DomainAccessLevel.Public;
 
-    DomainName[] SetDomainName() default DomainName.USER;
+    DomainName[] DomainName() default DomainName.USER;
 
 }

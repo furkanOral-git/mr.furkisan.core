@@ -3,50 +3,43 @@ package com.mrfurkisan.core.security.authorization;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Role {
+import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
+import com.mrfurkisan.core.domain.BaseEntity;
+
+public class Role extends BaseEntity<Number>{
 
     private List<DomainName> __domains;
-    private List<AllowedAction> __actions;
+    private List<RequestTypesEnum> __actions;
+    private AccessLevel __accessLevel;
+    private int __roleId;
 
-    public Role(int RoleId, AccessLevel AccessLevel) {
+    public Role(RolePrototype proto) {
+        
         super();
-        this.__domains = new ArrayList<DomainName>();
+        this.__domains = proto.GetDomains();
+        this.__accessLevel = proto.GetLevel();
+        this.__roleId = proto.GetId();
     }
 
-    public boolean IsExistDomain(String name) {
+    public boolean IsExistDomain(DomainName name) {
 
         return this.__domains.contains(name);
 
     }
 
-    public boolean CanYouDo(AllowedAction action) {
+    public AccessLevel getLevel() {
+        return this.__accessLevel;
+    }
+
+    public boolean CanYouDo(RequestTypesEnum action) {
 
         return this.__actions.contains(action);
     }
+    
 
-    public void AddDomain(DomainName domain) {
-
-        if (!this.__domains.contains(domain)) {
-
-            this.__domains.add(domain);
-        }
-
-    }
-
-    public void AddAction(AllowedAction action) {
+    @Override
+    public Number GetId() {
         
-        if (!this.__domains.contains(action)) {
-            this.__actions.add(action);
-        }
-    }
-
-    public void RemoveAction(AllowedAction action) {
-
-        this.__actions.remove(action);
-    }
-
-    public void RemoveDomain(DomainName domain) {
-
-        this.__domains.remove(domain);
+        return this.GetId();
     }
 }

@@ -22,4 +22,6 @@ public interface ICanAddCoreSecurityDependency {
     public ITokenRepository getTokenRepository();
 
     public IUserRepository getUserRepository();
+
+    
 }

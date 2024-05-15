@@ -15,10 +15,11 @@ public class SecurityTokenEntity extends BaseEntity<String> implements ISecurity
     private int __roleId;
     private int __userId;
 
-    SecurityTokenEntity(String uniqueId, String macAdress, int roleId, int userId) {
+    public SecurityTokenEntity(String uniqueId, String macAdress, int roleId, int userId) {
         this.__uniqueId = uniqueId;
         this.__macAddress = macAdress;
         this.__roleId = roleId;
+        this.__userId = userId;
     }
 
     public String GetCurrentMacAddress() {

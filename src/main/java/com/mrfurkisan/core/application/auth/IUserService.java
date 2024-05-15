@@ -2,15 +2,13 @@ package com.mrfurkisan.core.application.auth;
 
 import com.mrfurkisan.core.application.IApplicationService;
 import com.mrfurkisan.core.application.forms.RegisterForm;
-import com.mrfurkisan.core.contracts.requests.FreeDataRequest;
-import com.mrfurkisan.core.security.authentication.SecurityToken;
 import com.mrfurkisan.core.security.authentication.User;
 
 public interface IUserService extends IApplicationService {
 
-    public SecurityToken CreateUser(FreeDataRequest<RegisterForm> user);
+    public Boolean CreateUser(RegisterForm user, int roleId);
 
-    public Boolean DeleteUser(User user);
+    public Boolean DeleteUser(int userId);
 
     public Boolean ChangePassword(int userId, String newPassword);
 
@@ -21,6 +19,5 @@ public interface IUserService extends IApplicationService {
     public User GetUserByEmail(String email);
 
     public User GetUserByUsername(String userName);
-    
 
 }

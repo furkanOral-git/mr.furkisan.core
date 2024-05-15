@@ -1,13 +1,19 @@
 package com.mrfurkisan.core.infrastructure.security;
 
+import com.mrfurkisan.core.contracts.abstracts.BaseResponse;
+import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
+import com.mrfurkisan.core.contracts.responses.ErrorResponse;
+import com.mrfurkisan.core.contracts.responses.SuccessResponse;
 import com.mrfurkisan.core.security.authorization.AccessDimensionLevel;
 import com.mrfurkisan.core.security.authorization.AccessLevel;
 import com.mrfurkisan.core.security.authorization.Authority;
 import com.mrfurkisan.core.security.authorization.AuthorityDetails;
+import com.mrfurkisan.core.security.authorization.DomainAccessLevel;
+import com.mrfurkisan.core.security.authorization.Role;
 
 final class CoreSecurityLogicService {
 
-    public static Boolean IsItEnoughForAccess(AccessLevel levelForRole, AccessDimensionLevel dimensionLevel) {
+    private static Boolean IsItEnoughForAccess(AccessLevel levelForRole, AccessDimensionLevel dimensionLevel) {
 
         short dLevel = 0;
         short rLevel = 0;
@@ -67,6 +73,43 @@ final class CoreSecurityLogicService {
 
     }
 
+    public static BaseResponse IsValidForAuthority(Role role, Authority level, RequestTypesEnum requestType) {
+
+        if (!role.CanYouDo(requestType)) {
+            return new ErrorResponse("Forbidden action!");
+        }
+
+        if (!CoreSecurityLogicService.IsItEnoughForAccess(role.getLevel(), level.AccessDimensionLevel())) {
+            return new ErrorResponse("Not Authorized");
+        }
+
+        if (!CoreSecurityLogicService.CheckDomainNameAndDomainAccess(role, level)) {
+            return new ErrorResponse("Yetki siniri ihlali!");
+        }
+
+        return new SuccessResponse("Başarili");
+    }
+
+    private static Boolean CheckDomainNameAndDomainAccess(Role role, Authority level) {
+
+        var access = level.DomainAccess();
+        Boolean itWllPass = false;
+
+        if (access == DomainAccessLevel.DomainNameOnly) {
+
+            for (var domain : level.DomainName()) {
+
+                if (role.IsExistDomain(domain)) {
+                    itWllPass = true;
+                    break;
+                }
+                ;
+            }
+            return itWllPass;
+        }
+        return true;
+    }
+
     public static AuthorityDetails CheckAuthorityAnnotations() {
 
         /*
@@ -77,7 +120,7 @@ final class CoreSecurityLogicService {
          * annotation'ın ayarlarına ulaşarak bir AuthorityDetails nesnesi oluşturacak.
          */
         var stackTraces = Thread.currentThread().getStackTrace();
-        
+
         Authority classLevelAnnotation = null;
         Authority methodlevelAnnotation = null;
 

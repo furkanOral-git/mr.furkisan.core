@@ -1,6 +1,7 @@
 package com.mrfurkisan.core.security.authentication;
 
 public class SecurityToken implements ISecurityToken {
+    
     private String __uniqueId;
 
     public SecurityToken(String uniqueId) {
@@ -9,7 +10,7 @@ public class SecurityToken implements ISecurityToken {
     }
    
     @Override
-    public String GetSecurityToken() {
+    public String GetId() {
         return this.__uniqueId;
     }
 }

@@ -1,12 +1,12 @@
 package com.mrfurkisan.core.security.authentication;
 
 import com.mrfurkisan.core.domain.BaseEntity;
-import jakarta.persistence.Id;
+
+
 
 //@Entity: IEntity üzerinde tanımladığımız için ve @inheritance ile miras yolunu da açtığımız için gerek yok.
 public final class User extends BaseEntity<Number> {
-
-    @Id
+    
     private int __userId;
     private int __roleId;
     private String __defaultMacAddress;
@@ -14,8 +14,7 @@ public final class User extends BaseEntity<Number> {
     private String __password;
     private String __userName;
 
-    User(int userId, int roleId, String defaultMacAdress, String email, String password, String userName) {
-        this.__userId = userId;
+    public User(int roleId, String defaultMacAdress, String email, String password, String userName) {
         this.__roleId = roleId;
         this.__defaultMacAddress = defaultMacAdress;
         this.__email = email;
@@ -26,7 +25,7 @@ public final class User extends BaseEntity<Number> {
     public int GetRoleId() {
         return this.__roleId;
     }
-
+    
     public Number GetId() {
         return this.__userId;
     }

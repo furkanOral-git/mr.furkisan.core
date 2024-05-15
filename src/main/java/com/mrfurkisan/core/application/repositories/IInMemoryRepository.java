@@ -1,9 +1,10 @@
 package com.mrfurkisan.core.application.repositories;
 
 
+import com.mrfurkisan.core.domain.functional.IInMemoryFunctionalInterface;
 import com.mrfurkisan.core.domain.interfaces.IEntity;
 
-public interface IInMemoryRepository<TEntity extends IEntity,TId> extends IRepository<TEntity> {
-    
-    
+public interface IInMemoryRepository<TEntity extends IEntity, TId>
+        extends IRepository<TEntity, IInMemoryFunctionalInterface<TEntity>> {
+
 }

@@ -3,12 +3,10 @@ package com.mrfurkisan.core.infrastructure.persistence;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mrfurkisan.core.application.repositories.IInMemoryRepository;
 import com.mrfurkisan.core.domain.BaseEntity;
-import com.mrfurkisan.core.domain.functional.IFunctionalInterface;
+import com.mrfurkisan.core.domain.functional.IInMemoryFunctionalInterface;
 
-public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TId>
-        implements IInMemoryRepository<TEntity, TId> {
+public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TId>{
 
     private List<TEntity> __repo;
 
@@ -17,7 +15,7 @@ public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TI
         this.__repo = new ArrayList<TEntity>();
     }
 
-    @Override
+    
     public void Add(TEntity entity) {
 
         if (!this.__repo.contains(entity)) {
@@ -26,7 +24,7 @@ public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TI
         }
     }
 
-    @Override
+    
     public void Update(TEntity entity) {
 
         if (!this.__repo.contains(entity)) {
@@ -35,14 +33,14 @@ public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TI
         }
     }
 
-    @Override
+    
     public void Delete(TEntity entity) {
 
         this.__repo.remove(entity);
     }
 
-    @Override
-    public <TContext> List<TEntity> GetAllBy(IFunctionalInterface<TEntity, TContext> filter) {
+    
+    public List<TEntity> GetAllBy(IInMemoryFunctionalInterface<TEntity> filter) {
 
         List<TEntity> results = new ArrayList<TEntity>();
 
@@ -57,14 +55,14 @@ public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TI
 
     }
 
-    @Override
+    
     public List<TEntity> GetAll() {
 
         return this.__repo;
     }
-
-    @Override
-    public <TContext> TEntity GetBy(IFunctionalInterface<TEntity, TContext> filter) {
+    
+    
+    public  TEntity GetBy(IInMemoryFunctionalInterface<TEntity> filter) {
 
         for (TEntity tEntity : __repo) {
 
