@@ -38,14 +38,16 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
 
        this.__manager.persist(entity);
     }
-
+    
+    @Transactional
     public int Update(IJpaFunctionalInterface<TEntity, CriteriaUpdate<TEntity>> filter) {
 
         var builder = this.__manager.getCriteriaBuilder();
         CriteriaUpdate<TEntity> update = filter.build(builder);
         return this.__manager.createQuery(update).executeUpdate();
     }
-
+    
+    @Transactional
     public int Delete(IJpaFunctionalInterface<TEntity, CriteriaDelete<TEntity>> filter) {
 
         var builder = this.__manager.getCriteriaBuilder();

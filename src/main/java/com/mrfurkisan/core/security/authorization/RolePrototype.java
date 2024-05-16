@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RolePrototype {
+public final class RolePrototype {
 
     private List<DomainName> names;
     private AccessLevel level;

@@ -126,7 +126,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
         if (this.__repository instanceof UserJpaRepository) {
 
             var castedRepo = (UserJpaRepository) this.__repository;
-            
+
             IJpaFunctionalInterface<User, CriteriaUpdate<User>> filter = (CriteriaBuilder builder) -> {
 
                 CriteriaUpdate<User> update = builder.createCriteriaUpdate(User.class);
@@ -167,7 +167,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
         }
         return entity;
     }
-    
+
     @Override
     public User GetUserByUsername(String userName) {
 
@@ -192,5 +192,27 @@ public final class UserService<TRepository extends IUserRepository> implements I
         }
         return entity;
     }
-    
+
+    @Override
+    public User GetUserById(int id) {
+        
+        User entity = null;
+        if (this.__repository instanceof UserJpaRepository) {
+
+            var casted = (UserJpaRepository) this.__repository;
+
+            IJpaFunctionalInterface<User, CriteriaQuery<User>> filter = (CriteriaBuilder builder) -> {
+                CriteriaQuery<User> query = builder.createQuery(User.class);
+                Root<User> table = query.from(User.class);
+
+                Predicate pre = builder.equal(table.get("user_id"), id);
+                query.where(pre);
+
+                return query;
+            };
+            entity = casted.GetBy(filter);
+        }
+        return entity;
+    }
+
 }

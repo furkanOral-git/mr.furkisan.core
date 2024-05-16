@@ -5,6 +5,7 @@ import com.mrfurkisan.core.application.forms.*;
 import com.mrfurkisan.core.contracts.abstracts.*;
 import com.mrfurkisan.core.contracts.requests.*;
 import com.mrfurkisan.core.contracts.responses.*;
+import com.mrfurkisan.core.infrastructure.services.AuthorizationService;
 import com.mrfurkisan.core.security.authentication.*;
 import com.mrfurkisan.core.security.authorization.*;
 
@@ -13,25 +14,23 @@ public final class CoreSecurityCenter implements ISecurityCenter {
     private final ITokenService __tokenService;
     private final IUserService __userService;
     private final AuthorizationService __authorManager;
-    
-    public CoreSecurityCenter(ITokenService tokenService, IUserService userService, IAuthorizationService builder
-           ) {
+
+    public CoreSecurityCenter(ITokenService tokenService, IUserService userService, IAuthorizationService builder) {
         super();
         this.__userService = userService;
         this.__tokenService = tokenService;
         this.__authorManager = (AuthorizationService) builder;
-       
+
     }
-        
 
     public BaseDataResponse<SecurityToken> Verify(FreeDataRequest<LoginForm> loginReq) {
 
         var loginForm = loginReq.GetData();
-        var user = this.__userService.GetUserByEmail(loginForm.getEmailOrUsername());
+        var user = this.__userService.GetUserByEmail(loginForm.emailOrUsername());
         var isEmailEntered = true;
         if (user == null) {
 
-            user = this.__userService.GetUserByUsername(loginForm.getEmailOrUsername());
+            user = this.__userService.GetUserByUsername(loginForm.emailOrUsername());
             isEmailEntered = false;
             if (user == null) {
 
@@ -42,11 +41,11 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         // Ternary
         String userEmailOrUsername = (isEmailEntered) ? user.getEmail() : user.getUsername();
         // == operatörü hata verdi
-        return (userEmailOrUsername.equals(loginForm.getEmailOrUsername())
-                && user.getPassword().equals(loginForm.getPassword()))
+        return (userEmailOrUsername.equals(loginForm.emailOrUsername())
+                && user.getPassword().equals(loginForm.password()))
                         ? new SuccessDataResponse<SecurityToken>("Authenticated",
                                 this.__tokenService.CreateToken(user.getUser_id(), user.getRole_id(),
-                                        loginForm.getMacAddress()))
+                                        loginForm.macAddress()))
                         : new ErrorDataResponse<SecurityToken>("Kullanici adi ya da şifrenizi yanliş girdiniz!");
 
     }
@@ -79,10 +78,15 @@ public final class CoreSecurityCenter implements ISecurityCenter {
     public BaseResponse ChangePassword(SecureDataRequest<String> req) {
 
         SecurityTokenEntity tokenEntity = this.Validate(req.GetToken().GetId());
-
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
+        
+        User user = this.__userService.GetUserById(tokenEntity.getUser_id());
+        if (user.getPassword().equals(req.GetData())) {
+            return new ErrorResponse("Yeni şifreniz bir öncekiyle ayni olamaz!");
+        }
+
         var success = this.__userService.ChangePassword(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
@@ -97,6 +101,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         SecurityTokenEntity tokenEntity = this.Validate(req.GetToken().GetId());
 
         if (tokenEntity == null) {
+
             return new ErrorResponse("Cannot Validated Token!");
         }
         var searchResult = this.__userService.GetUserByEmail(req.GetData());

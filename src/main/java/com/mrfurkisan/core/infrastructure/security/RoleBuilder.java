@@ -2,12 +2,13 @@ package com.mrfurkisan.core.infrastructure.security;
 
 import com.mrfurkisan.core.application.auth.IAuthorizationService;
 import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
+import com.mrfurkisan.core.infrastructure.services.AuthorizationService;
 import com.mrfurkisan.core.security.authorization.AccessLevel;
 import com.mrfurkisan.core.security.authorization.DomainName;
 import com.mrfurkisan.core.security.authorization.Role;
 import com.mrfurkisan.core.security.authorization.RolePrototype;
 
-class RoleBuilder implements IRoleBuilder {
+public class RoleBuilder implements IRoleBuilder {
 
     private IAuthorizationService __service;
     private final RolePrototype __prototype;

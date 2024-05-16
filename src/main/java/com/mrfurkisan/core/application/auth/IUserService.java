@@ -20,4 +20,6 @@ public interface IUserService extends IApplicationService {
 
     public User GetUserByUsername(String userName);
 
+    public User GetUserById(int id);
+
 }

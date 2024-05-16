@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Role implements IEntity {
+public final class Role implements IEntity {
 
     @Id
     private String role_id;
@@ -25,6 +25,7 @@ public class Role implements IEntity {
 
         super();
         this.domains = proto.GetDomains();
+        this.actions = proto.GetActions();
         this.access_level = proto.getLevel();
         this.role_id = proto.getId();
     }
