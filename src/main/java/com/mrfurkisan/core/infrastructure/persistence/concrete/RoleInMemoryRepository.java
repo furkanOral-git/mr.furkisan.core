@@ -1,21 +1,13 @@
 package com.mrfurkisan.core.infrastructure.persistence.concrete;
 
+import com.mrfurkisan.core.application.auth.IRoleRepository;
 import com.mrfurkisan.core.infrastructure.persistence.BaseInMemoryRepository;
 import com.mrfurkisan.core.security.authorization.Role;
 
-public class RoleInMemoryRepository extends BaseInMemoryRepository<Role, Number>{
-    // Verileri bellekte tuttuğu için singleton patterni uyguladım.
-    private static RoleInMemoryRepository __instance;
+public class RoleInMemoryRepository extends BaseInMemoryRepository<Role, String> implements IRoleRepository{
 
-    private RoleInMemoryRepository() {
+    public RoleInMemoryRepository() {
         super();
     }
-
-    public static RoleInMemoryRepository GetRepo() {
-
-        if (__instance == null) {
-            __instance = new RoleInMemoryRepository();
-        }
-        return __instance;
-    }
+    
 }

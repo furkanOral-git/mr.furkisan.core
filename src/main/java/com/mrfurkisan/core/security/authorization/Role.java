@@ -1,45 +1,47 @@
 package com.mrfurkisan.core.security.authorization;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
-import com.mrfurkisan.core.domain.BaseEntity;
+import com.mrfurkisan.core.domain.interfaces.IEntity;
 
-public class Role extends BaseEntity<Number>{
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.Data;
 
-    private List<DomainName> __domains;
-    private List<RequestTypesEnum> __actions;
-    private AccessLevel __accessLevel;
-    private int __roleId;
+@Entity
+@Data
+public class Role implements IEntity {
+
+    @Id
+    private String role_id;
+    
+    private List<DomainName> domains;
+    private List<RequestTypesEnum> actions;
+    private AccessLevel access_level;
+    
 
     public Role(RolePrototype proto) {
-        
+
         super();
-        this.__domains = proto.GetDomains();
-        this.__accessLevel = proto.GetLevel();
-        this.__roleId = proto.GetId();
+        this.domains = proto.GetDomains();
+        this.access_level = proto.getLevel();
+        this.role_id = proto.getId();
     }
 
     public boolean IsExistDomain(DomainName name) {
 
-        return this.__domains.contains(name);
+        return this.domains.contains(name);
 
     }
 
     public AccessLevel getLevel() {
-        return this.__accessLevel;
+        return this.access_level;
     }
 
     public boolean CanYouDo(RequestTypesEnum action) {
 
-        return this.__actions.contains(action);
+        return this.actions.contains(action);
     }
-    
 
-    @Override
-    public Number GetId() {
-        
-        return this.GetId();
-    }
 }

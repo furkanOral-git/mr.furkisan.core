@@ -12,49 +12,42 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     private final ITokenService __tokenService;
     private final IUserService __userService;
-    private static CoreSecurityCenter __instance;
-    private final AuthorizationManager __authorManager;
-
-    private CoreSecurityCenter(ITokenService tokenService, IUserService userService) {
+    private final AuthorizationService __authorManager;
+    
+    public CoreSecurityCenter(ITokenService tokenService, IUserService userService, IAuthorizationService builder
+           ) {
         super();
         this.__userService = userService;
         this.__tokenService = tokenService;
-        this.__authorManager = AuthorizationManager.GetInstance();
+        this.__authorManager = (AuthorizationService) builder;
+       
     }
-
-    public final static CoreSecurityCenter GetSecurity(ITokenService tokenService, IUserService userService) {
-
-        if (__instance == null) {
-
-            __instance = new CoreSecurityCenter(tokenService, userService);
-        }
-        return __instance;
-    }
+        
 
     public BaseDataResponse<SecurityToken> Verify(FreeDataRequest<LoginForm> loginReq) {
 
         var loginForm = loginReq.GetData();
         var user = this.__userService.GetUserByEmail(loginForm.getEmailOrUsername());
-        var isEmailJoined = true;
+        var isEmailEntered = true;
         if (user == null) {
 
             user = this.__userService.GetUserByUsername(loginForm.getEmailOrUsername());
-            isEmailJoined = false;
-        }
+            isEmailEntered = false;
+            if (user == null) {
 
-        if (user == null) {
-            return new ErrorDataResponse<SecurityToken>("Böyle bir kullanici yok");
+                return new ErrorDataResponse<SecurityToken>("Böyle bir kullanici yok");
 
+            }
         }
-
-        if (isEmailJoined) {
-            return (user.GetEmail() == loginForm.getEmailOrUsername())
-                    ? new SuccessDataResponse<SecurityToken>("Authenticated", this.__tokenService.CreateToken(user))
-                    : new ErrorDataResponse<SecurityToken>("Kullanici adi ya da şifrenizi yanliş girdiniz!");
-        }
-        return (user.GetUserName() == loginForm.getEmailOrUsername())
-                ? new SuccessDataResponse<SecurityToken>("Authenticated", this.__tokenService.CreateToken(user))
-                : new ErrorDataResponse<SecurityToken>("Kullanici adi ya da şifrenizi yanlış girdiniz!");
+        // Ternary
+        String userEmailOrUsername = (isEmailEntered) ? user.getEmail() : user.getUsername();
+        // == operatörü hata verdi
+        return (userEmailOrUsername.equals(loginForm.getEmailOrUsername())
+                && user.getPassword().equals(loginForm.getPassword()))
+                        ? new SuccessDataResponse<SecurityToken>("Authenticated",
+                                this.__tokenService.CreateToken(user.getUser_id(), user.getRole_id(),
+                                        loginForm.getMacAddress()))
+                        : new ErrorDataResponse<SecurityToken>("Kullanici adi ya da şifrenizi yanliş girdiniz!");
 
     }
 
@@ -68,7 +61,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         // AccessLevel.Authenticated standart giriş yapmış kullanıcı seviyesi olarak
         // belirleniyor.
         var authedRole = this.__authorManager.GetBy((role) -> role.getLevel() == AccessLevel.Authenticated);
-        var isOk = this.__userService.CreateUser(registerReq.GetData(), (int) authedRole.GetId());
+        var isOk = this.__userService.CreateUser(registerReq.GetData(), authedRole.getRole_id());
         return (isOk == true)
                 ? new SuccessResponse("Kayit tamamlandi")
                 : new ErrorResponse("Kayit tamamlanirken bir hata oluştu!");
@@ -90,7 +83,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
-        var success = this.__userService.ChangePassword(tokenEntity.GetUserId(), req.GetData());
+        var success = this.__userService.ChangePassword(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
             this.__tokenService.DeleteToken(tokenEntity);
@@ -106,7 +99,11 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
-        var success = this.__userService.ChangeEmail(tokenEntity.GetUserId(), req.GetData());
+        var searchResult = this.__userService.GetUserByEmail(req.GetData());
+        if (searchResult != null) {
+            return new ErrorResponse("Girdiğiniz email zaten kayitli!");
+        }
+        var success = this.__userService.ChangeEmail(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
             this.__tokenService.DeleteToken(tokenEntity);
@@ -135,7 +132,11 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
-        var success = this.__userService.ChangeUsername(tokenEntity.GetUserId(), req.GetData());
+        var searchResult = this.__userService.GetUserByUsername(req.GetData());
+        if (searchResult != null) {
+            return new ErrorResponse("Girdiğiniz kullanici adi kullaniliyor!");
+        }
+        var success = this.__userService.ChangeUsername(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
             this.__tokenService.DeleteToken(tokenEntity);
@@ -151,44 +152,12 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
+        // db sorguları
+        Role role = this.__authorManager.GetBy((e) -> e.getRole_id() == tokenEntity.getRole_id());
 
-        Role role = this.__authorManager.GetBy((e) -> (int) e.GetId() == tokenEntity.GetRoleId());
+        // Authorization'a özel bussiness logic işlemleri.
+        return CoreSecurityAuthorizationLogic.ValidateAuthority(role, req.GetRequestType());
 
-        AuthorityDetails details = CoreSecurityLogicService.CheckAuthorityAnnotations();
-        if (details.classLevel() == null && details.methodLevel() == null) {
-            return new ErrorResponse(
-                    "Internal Error : Check the authority configuration of controllers, that error occurs on missing annotation declaring!");
-        }
-
-        /*
-         * Class level kontrolü
-         * Kural : MethodLevel > ClassLevel
-         * Yani öncelikli olarak method level kurallarından geçmiş olması gerekiyor
-         * .
-         */
-
-        Authority classLevel = details.classLevel();
-        Authority methodLevel = details.methodLevel();
-
-        if (classLevel == null) {
-
-            return CoreSecurityLogicService.IsValidForAuthority(role, methodLevel, req.GetRequestType());
-        }
-        if (methodLevel == null) {
-
-            return CoreSecurityLogicService.IsValidForAuthority(role, classLevel, req.GetRequestType());
-        }
-        if (methodLevel != null && classLevel != null) {
-
-            return CoreSecurityLogicService.IsValidForAuthority(role, methodLevel, req.GetRequestType());
-        }
-        return new ErrorResponse("Not Authorized!");
-
-    }
-
-    public static IAuthorizationBuilder AuthorizationBuilder() {
-
-        return AuthorizationManager.GetInstance();
     }
 
 }

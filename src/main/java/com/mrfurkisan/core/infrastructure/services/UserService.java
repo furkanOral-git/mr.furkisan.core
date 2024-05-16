@@ -26,11 +26,17 @@ public final class UserService<TRepository extends IUserRepository> implements I
     }
 
     @Override
-    public Boolean CreateUser(RegisterForm form, int roleId) {
+    public Boolean CreateUser(RegisterForm form, String roleId) {
 
         var initialUserName = String.format("User-%s", UUID.randomUUID().toString().replace("-", ""));
 
-        User user = new User(roleId, form.macAddress(), form.password(), form.password(), initialUserName);
+        User user = new User();
+        user.setEmail(form.email());
+        user.setPassword(form.password());
+        user.setRole_id(roleId);
+        user.setDefault_mac_address(form.macAddress());
+        user.setUsername(initialUserName);
+
         if (this.__repository instanceof UserJpaRepository) {
             var castedRepo = (UserJpaRepository) __repository;
             castedRepo.Add(user);
@@ -43,17 +49,17 @@ public final class UserService<TRepository extends IUserRepository> implements I
     public Boolean DeleteUser(int userId) {
 
         if (this.__repository instanceof UserJpaRepository) {
-            
+
             var castedRepo = (UserJpaRepository) this.__repository;
 
-            IJpaFunctionalInterface<User,CriteriaDelete<User>> filter = (CriteriaBuilder builder) ->{
-                
+            IJpaFunctionalInterface<User, CriteriaDelete<User>> filter = (CriteriaBuilder builder) -> {
+
                 CriteriaDelete<User> delete = builder.createCriteriaDelete(User.class);
                 Root<User> table = delete.from(User.class);
 
                 delete.from(User.class);
 
-                delete.where(builder.equal(table.get("id"), userId));
+                delete.where(builder.equal(table.get("user_id"), userId));
                 return delete;
             };
             castedRepo.Delete(filter);
@@ -75,7 +81,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 Root<User> userTable = update.from(User.class);
 
                 update.set("password", newPassword);
-                update.where(builder.equal(userTable.get("id"), userId));
+                update.where(builder.equal(userTable.get("user_id"), userId));
 
                 return update;
 
@@ -101,7 +107,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 Root<User> userTable = update.from(User.class);
 
                 update.set("email", newEmail);
-                update.where(builder.equal(userTable.get("id"), userId));
+                update.where(builder.equal(userTable.get("user_id"), userId));
 
                 return update;
 
@@ -120,14 +126,14 @@ public final class UserService<TRepository extends IUserRepository> implements I
         if (this.__repository instanceof UserJpaRepository) {
 
             var castedRepo = (UserJpaRepository) this.__repository;
-
+            
             IJpaFunctionalInterface<User, CriteriaUpdate<User>> filter = (CriteriaBuilder builder) -> {
 
                 CriteriaUpdate<User> update = builder.createCriteriaUpdate(User.class);
                 Root<User> userTable = update.from(User.class);
 
                 update.set("username", newUserName);
-                update.where(builder.equal(userTable.get("id"), userId));
+                update.where(builder.equal(userTable.get("user_id"), userId));
 
                 return update;
 
@@ -139,9 +145,9 @@ public final class UserService<TRepository extends IUserRepository> implements I
 
     @Override
     public User GetUserByEmail(String email) {
-        
+
         User entity = null;
-        
+
         if (this.__repository instanceof UserJpaRepository) {
             var castedRepo = (UserJpaRepository) this.__repository;
 
@@ -151,7 +157,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 Root<User> table = query.from(User.class);
 
                 // tabloda email kolonunu al ve email ile eşit mi diye kontrol et
-                Predicate predicate = builder.equal(table.get(email), email);
+                Predicate predicate = builder.equal(table.get("email"), email);
 
                 query.where(predicate);
                 return query;
@@ -161,10 +167,10 @@ public final class UserService<TRepository extends IUserRepository> implements I
         }
         return entity;
     }
-
+    
     @Override
     public User GetUserByUsername(String userName) {
-        
+
         User entity = null;
 
         if (this.__repository instanceof UserJpaRepository) {
@@ -186,5 +192,5 @@ public final class UserService<TRepository extends IUserRepository> implements I
         }
         return entity;
     }
-
+    
 }

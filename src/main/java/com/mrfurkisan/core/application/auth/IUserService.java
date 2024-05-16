@@ -6,7 +6,7 @@ import com.mrfurkisan.core.security.authentication.User;
 
 public interface IUserService extends IApplicationService {
 
-    public Boolean CreateUser(RegisterForm user, int roleId);
+    public Boolean CreateUser(RegisterForm user, String roleId);
 
     public Boolean DeleteUser(int userId);
 

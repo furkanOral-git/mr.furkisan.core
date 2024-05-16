@@ -10,9 +10,12 @@ import com.mrfurkisan.core.domain.interfaces.IEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -28,27 +31,26 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
         this.__manager = manager;
         this.__type = type;
     }
-
+    //@Transactional herhangi bir işlemin kesilmesi durumunda değişiklikleri geri almaya yarayan bir bağlam.
+    //EntityManager'ı direkt kullanırken bunu eklemek zorunlu kılınıyor!
+    @Transactional
     public void Add(TEntity entity) {
 
-        if (this.__manager.isOpen()) {
-
-            this.__manager.persist(entity);
-        }
+       this.__manager.persist(entity);
     }
 
-    public void Update(IJpaFunctionalInterface<TEntity, CriteriaUpdate<TEntity>> filter) {
+    public int Update(IJpaFunctionalInterface<TEntity, CriteriaUpdate<TEntity>> filter) {
 
         var builder = this.__manager.getCriteriaBuilder();
         CriteriaUpdate<TEntity> update = filter.build(builder);
-        this.__manager.createQuery(update).executeUpdate();
+        return this.__manager.createQuery(update).executeUpdate();
     }
 
-    public void Delete(IJpaFunctionalInterface<TEntity, CriteriaDelete<TEntity>> filter) {
+    public int Delete(IJpaFunctionalInterface<TEntity, CriteriaDelete<TEntity>> filter) {
 
         var builder = this.__manager.getCriteriaBuilder();
         CriteriaDelete<TEntity> delete = filter.build(builder);
-        this.__manager.createQuery(delete).executeUpdate();
+        return this.__manager.createQuery(delete).executeUpdate();
     }
 
     public List<TEntity> GetAllBy(IJpaFunctionalInterface<TEntity, CriteriaQuery<TEntity>> filter) {
@@ -76,7 +78,25 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
 
         var builder = this.__manager.getCriteriaBuilder();
         CriteriaQuery<TEntity> query = filter.build(builder);
-        return this.__manager.createQuery(query).getSingleResult();
+        TEntity entity = null;
+        try {
+
+            entity = this.__manager.createQuery(query).getSingleResult();
+            
+
+        } catch (Exception e) {
+            
+            if(e instanceof NoResultException){
+                
+                return entity;
+            }
+            if(e instanceof NonUniqueResultException){
+                return entity;
+            }
+            
+        }
+        return entity;
+        
     }
 
 }

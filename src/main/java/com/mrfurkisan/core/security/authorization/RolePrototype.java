@@ -2,51 +2,44 @@ package com.mrfurkisan.core.security.authorization;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class RolePrototype {
 
-    private List<DomainName> __names;
-    private AccessLevel __level;
-    private List<RequestTypesEnum> __actions;
-    private int __id;
+    private List<DomainName> names;
+    private AccessLevel level;
+    private List<RequestTypesEnum> actions;
+    private final String id;
 
-    public RolePrototype(AccessLevel level) {
+    public RolePrototype() {
 
-        this.__actions = new ArrayList<RequestTypesEnum>();
-        this.__names = new ArrayList<DomainName>();
-        this.__level = level;
+        this.actions = new ArrayList<RequestTypesEnum>();
+        this.names = new ArrayList<DomainName>();
+        this.id =  UUID.randomUUID().toString();
     }
 
     public List<DomainName> GetDomains() {
-        return this.__names;
+        return this.names;
     }
 
     public List<RequestTypesEnum> GetActions() {
-        return this.__actions;
-    }
-
-    public int GetId() {
-
-        return this.__id;
-    }
-
-    public void SetId(int id) {
-        this.__id = id;
-    }
-
-    public AccessLevel GetLevel() {
-        return this.__level;
+        return this.actions;
     }
 
     public void AddDomain(DomainName name) {
 
-        this.__names.add(name);
+        this.names.add(name);
     }
 
     public void AddAction(RequestTypesEnum action) {
-        this.__actions.add(action);
+        this.actions.add(action);
     }
 
 }

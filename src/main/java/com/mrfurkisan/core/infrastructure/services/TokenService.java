@@ -27,11 +27,13 @@ public final class TokenService<TRepository extends ITokenRepository> implements
     public SecurityTokenEntity GetEntityByTokenId(String token) {
 
         SecurityTokenEntity entity = null;
+        // InMemory database kodları
         if (__repository instanceof TokenInMemoryRepository) {
 
             TokenInMemoryRepository castedRepo = (TokenInMemoryRepository) this.__repository;
-            entity = castedRepo.GetBy((t) -> t.GetId() == token);
+            entity = castedRepo.GetBy((t) -> t.getUnique_id() == token);
         }
+        // Jpa database kodları
         if (__repository instanceof TokenJpaRepository) {
 
             TokenJpaRepository castedRepo = (TokenJpaRepository) this.__repository;
@@ -41,7 +43,7 @@ public final class TokenService<TRepository extends ITokenRepository> implements
 
                 CriteriaQuery<SecurityTokenEntity> query = builder.createQuery(SecurityTokenEntity.class);
                 Root<SecurityTokenEntity> root = query.from(SecurityTokenEntity.class);
-                Predicate predicate = builder.equal(root.get("id"), token);
+                Predicate predicate = builder.equal(root.get("unique_id"), token);
 
                 query.where(predicate);
 
@@ -54,14 +56,17 @@ public final class TokenService<TRepository extends ITokenRepository> implements
     }
 
     @Override
-    public SecurityToken CreateToken(User user) {
+    public SecurityToken CreateToken(int userId, String roleId, String currentMacAddress) {
 
-        String rondomId = UUID.randomUUID().toString().replace("-", "");
-        String macAdressRondom = UUID.randomUUID().toString().replace("-", "");
-        var securityTokenEntity = new SecurityTokenEntity(rondomId, macAdressRondom, user.GetRoleId(),
-                (int) user.GetId());
-        // CQRS soyutlamasıyla veritabanı farklılıklarından dolayı, işlemlerin de
-        // farklılaşmasına çözüm olarak kullanılabilir.
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+
+        var securityTokenEntity = new SecurityTokenEntity();
+        securityTokenEntity.setMac_address(currentMacAddress);
+        securityTokenEntity.setUnique_id(uuid);
+        securityTokenEntity.setRole_id(roleId);
+        securityTokenEntity.setUser_id(userId);
+        // CQRS kullanımı, veritabanı farklılıklarından dolayı işlemlerin de
+        // farklılaşması durumuna çözüm olarak kullanılabilir.
         // Fakat ben şuanda kullanmıcam.
 
         if (this.__repository instanceof TokenInMemoryRepository) {
@@ -74,7 +79,7 @@ public final class TokenService<TRepository extends ITokenRepository> implements
             castedRepo.Add(securityTokenEntity);
         }
 
-        return new SecurityToken(rondomId);
+        return new SecurityToken(uuid);
     }
 
     @Override
@@ -94,8 +99,8 @@ public final class TokenService<TRepository extends ITokenRepository> implements
 
                 Root<SecurityTokenEntity> table = delete.from(SecurityTokenEntity.class);
 
-                delete.where(builder.equal(table.get("id"), tokenEntity.GetId()));
-                
+                delete.where(builder.equal(table.get("unique_id"), tokenEntity.getUnique_id()));
+
                 return delete;
 
             };

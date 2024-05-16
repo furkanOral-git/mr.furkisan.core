@@ -11,7 +11,7 @@ import com.mrfurkisan.core.security.authorization.AuthorityDetails;
 import com.mrfurkisan.core.security.authorization.DomainAccessLevel;
 import com.mrfurkisan.core.security.authorization.Role;
 
-final class CoreSecurityLogicService {
+final class CoreSecurityAuthorizationLogic {
 
     private static Boolean IsItEnoughForAccess(AccessLevel levelForRole, AccessDimensionLevel dimensionLevel) {
 
@@ -73,17 +73,17 @@ final class CoreSecurityLogicService {
 
     }
 
-    public static BaseResponse IsValidForAuthority(Role role, Authority level, RequestTypesEnum requestType) {
+    private static BaseResponse IsValidForAuthority(Role role, Authority level, RequestTypesEnum requestType) {
 
         if (!role.CanYouDo(requestType)) {
             return new ErrorResponse("Forbidden action!");
         }
 
-        if (!CoreSecurityLogicService.IsItEnoughForAccess(role.getLevel(), level.AccessDimensionLevel())) {
+        if (!CoreSecurityAuthorizationLogic.IsItEnoughForAccess(role.getLevel(), level.AccessDimensionLevel())) {
             return new ErrorResponse("Not Authorized");
         }
 
-        if (!CoreSecurityLogicService.CheckDomainNameAndDomainAccess(role, level)) {
+        if (!CoreSecurityAuthorizationLogic.CheckDomainNameAndDomainAccess(role, level)) {
             return new ErrorResponse("Yetki siniri ihlali!");
         }
 
@@ -110,7 +110,7 @@ final class CoreSecurityLogicService {
         return true;
     }
 
-    public static AuthorityDetails CheckAuthorityAnnotations() {
+    private static AuthorityDetails CheckAuthorityAnnotations() {
 
         /*
          * C# taki getFrames() methodu yerine kullanılabilecek yöntem. Controller'dan
@@ -153,5 +153,37 @@ final class CoreSecurityLogicService {
         }
         return new AuthorityDetails(classLevelAnnotation, methodlevelAnnotation);
 
+    }
+    
+    public static BaseResponse ValidateAuthority(Role role, RequestTypesEnum req) {
+
+        AuthorityDetails details = CoreSecurityAuthorizationLogic.CheckAuthorityAnnotations();
+        if (details.classLevel() == null && details.methodLevel() == null) {
+            return new ErrorResponse(
+                    "Internal Error : Check the authority configuration of controllers, that error occurs on missing annotation declaring!");
+        }
+
+        /*
+         * Class level kontrolü
+         * Kural : MethodLevel > ClassLevel
+         * Yani öncelikli olarak method level kurallarından geçmiş olması gerekiyor
+         * .
+         */
+
+        Authority classLevel = details.classLevel();
+        Authority methodLevel = details.methodLevel();
+        if (methodLevel == null) {
+
+            return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, classLevel, req);
+        }
+        if (classLevel == null) {
+
+            return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, methodLevel, req);
+        }
+        if (methodLevel != null && classLevel != null) {
+
+            return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, methodLevel, req);
+        }
+        return new ErrorResponse("Not Authorized!");
     }
 }

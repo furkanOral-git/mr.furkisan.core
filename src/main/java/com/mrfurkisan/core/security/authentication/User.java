@@ -1,48 +1,25 @@
 package com.mrfurkisan.core.security.authentication;
 
-import com.mrfurkisan.core.domain.BaseEntity;
+import com.mrfurkisan.core.domain.interfaces.IEntity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
 
-
-//@Entity: IEntity üzerinde tanımladığımız için ve @inheritance ile miras yolunu da açtığımız için gerek yok.
-public final class User extends BaseEntity<Number> {
+@Entity
+@Table(name = "Users")
+@Data // Lombok - @Getter final olmayanlar için @Setter ve @NoArgsConstructor ... kısaltması
+public class User implements IEntity{
     
-    private int __userId;
-    private int __roleId;
-    private String __defaultMacAddress;
-    private String __email;
-    private String __password;
-    private String __userName;
-
-    public User(int roleId, String defaultMacAdress, String email, String password, String userName) {
-        this.__roleId = roleId;
-        this.__defaultMacAddress = defaultMacAdress;
-        this.__email = email;
-        this.__password = password;
-        this.__userName = userName;
-    }
-
-    public int GetRoleId() {
-        return this.__roleId;
-    }
-    
-    public Number GetId() {
-        return this.__userId;
-    }
-
-    public String GetDefaultMacAddress() {
-        return this.__defaultMacAddress;
-    }
-
-    public String GetEmail() {
-        return this.__email;
-    }
-
-    public String GetPassword() {
-        return this.__password;
-    }
-
-    public String GetUserName() {
-        return this.__userName;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int user_id;
+    private String email;
+    private String default_mac_address;
+    private String role_id;
+    private String username;
+    private String password;
 }

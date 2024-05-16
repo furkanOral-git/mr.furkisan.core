@@ -1,54 +1,44 @@
 package com.mrfurkisan.core.infrastructure.security;
 
+import com.mrfurkisan.core.application.auth.IAuthorizationService;
 import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
+import com.mrfurkisan.core.security.authorization.AccessLevel;
 import com.mrfurkisan.core.security.authorization.DomainName;
+import com.mrfurkisan.core.security.authorization.Role;
 import com.mrfurkisan.core.security.authorization.RolePrototype;
 
-class RoleCreator implements IRoleBuilder {
+class RoleBuilder implements IRoleBuilder {
 
-    private IAuthorizationBuilder __builder;
-    private static RoleCreator __instance;
-    private RolePrototype __prototype;
+    private IAuthorizationService __service;
+    private final RolePrototype __prototype;
 
-    private RoleCreator(IAuthorizationBuilder builder) {
+    public RoleBuilder(IAuthorizationService service) {
+        
         super();
-        this.__builder = builder;
-    }
-
-    public static IRoleBuilder GetInstance(IAuthorizationBuilder builder) {
-
-        if (__instance == null) {
-
-            __instance = new RoleCreator(builder);
-        }
-        return __instance;
-    }
-
-    public void SetProto(RolePrototype prototype) {
-        this.__prototype = prototype;
+        this.__service = service;
+        this.__prototype = new RolePrototype();
     }
 
     public RolePrototype GetProto() {
         return this.__prototype;
     }
 
-    @Override
+   
     public IRoleBuilder AddDomain(DomainName domain) {
 
         this.__prototype.AddDomain(domain);
         return this;
     }
 
-    @Override
+   
     public IRoleBuilder AddAction(RequestTypesEnum action) {
 
         this.__prototype.AddAction(action);
         return this;
     }
 
-    @Override
+    
     public IRoleBuilder AddAllActions() {
-
 
         this.__prototype.AddAction(RequestTypesEnum.DELETE);
         this.__prototype.AddAction(RequestTypesEnum.GET);
@@ -57,11 +47,18 @@ class RoleCreator implements IRoleBuilder {
         return this;
     }
 
-    @Override
-    public IAuthorizationBuilder BuildRole() {
+    
+    public void BuildRole() {
+    
+       var casted = (AuthorizationService)this.__service;
+       casted.Add(new Role(this.__prototype));
+       
+    }
 
-        var manager = (AuthorizationManager) __builder;
-        manager.Create(this.__prototype);
-        return manager;
+    
+    public IRoleBuilder SetAccessLevel(AccessLevel level) {
+        
+        this.__prototype.setLevel(level);
+        return this;
     }
 }

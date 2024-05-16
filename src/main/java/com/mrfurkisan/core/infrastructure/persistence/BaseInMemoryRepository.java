@@ -3,12 +3,13 @@ package com.mrfurkisan.core.infrastructure.persistence;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mrfurkisan.core.domain.BaseEntity;
+
 import com.mrfurkisan.core.domain.functional.IInMemoryFunctionalInterface;
+import com.mrfurkisan.core.domain.interfaces.IEntity;
 
-public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TId>{
+public abstract class BaseInMemoryRepository<TEntity extends IEntity, TId>{
 
-    private List<TEntity> __repo;
+    private final List<TEntity> __repo;
 
     public BaseInMemoryRepository() {
 
@@ -25,11 +26,19 @@ public abstract class BaseInMemoryRepository<TEntity extends BaseEntity<TId>, TI
     }
 
     
-    public void Update(TEntity entity) {
+    public void Update(IInMemoryFunctionalInterface<TEntity> filter,TEntity newEntity) {
 
-        if (!this.__repo.contains(entity)) {
-            this.__repo.removeIf((e) -> e.GetId() == entity.GetId());
-            this.__repo.add(entity);
+        if (!this.__repo.contains(newEntity)) {
+            
+            for (TEntity tEntity : this.__repo) {
+
+                if (filter.build(tEntity)) {
+                    
+                    this.__repo.remove(tEntity);
+                    this.__repo.add(newEntity);
+                }
+            }
+            
         }
     }
 

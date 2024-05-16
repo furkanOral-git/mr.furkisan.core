@@ -25,6 +25,10 @@ module core {
     requires spring.context;
     requires spring.core;
     requires transitive spring.web;
+    requires spring.tx;
+    requires lombok;
+    requires spring.beans;
+    
     
     
 
