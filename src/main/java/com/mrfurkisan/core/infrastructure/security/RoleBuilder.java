@@ -58,11 +58,16 @@ public class RoleBuilder implements IRoleBuilder {
             entityRole.setRole_id(this.__prototype.getId());
             this.__service.AddRoleEntityToDb(entityRole);
 
+            Role role = new Role(this.__prototype);
+            role.setAggregate((ArrayList<RequestType>) this.__prototype.getActions());
+            this.__service.AddRoleToInMemory(role);
+            return;
         }
-
-        Role role = new Role(this.__prototype);
+        
+        Role role = new Role(result);
         role.setAggregate((ArrayList<RequestType>) this.__prototype.getActions());
         this.__service.AddRoleToInMemory(role);
+        
 
     }
     @Override

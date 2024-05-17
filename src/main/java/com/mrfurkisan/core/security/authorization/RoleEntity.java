@@ -2,6 +2,7 @@ package com.mrfurkisan.core.security.authorization;
 
 import com.mrfurkisan.core.domain.interfaces.IEntityAggregateRoot;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,6 +15,7 @@ public class RoleEntity implements IEntityAggregateRoot {
     
     @Id
     private String role_id;
+    @Column(unique = true)
     private DomainName domain_name;
     private AccessLevel access_level;
 }

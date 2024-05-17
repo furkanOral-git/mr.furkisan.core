@@ -127,7 +127,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         /*
          * ilerleyen zamanlarda mac adresi doğrulama, eğer eşit değilse email ve şifre
          * isteme gibi güvenliği kanıtlamaya dayalı işlemler burada yer alacak.
-         * email gönderme,sms gönderme etc.
+         * email doğrulaması,sms doğrulaması gibi...
          */
         return tokenEntity;
 
@@ -160,7 +160,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
-        // db sorguları
+        //Role null geliyor!!
         Role role = this.__authorManager.GetRoleById(tokenEntity.getRole_id());
 
         // Authorization'a özel bussiness logic işlemleri.
