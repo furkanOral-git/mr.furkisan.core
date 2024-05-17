@@ -116,7 +116,7 @@ public final class TokenService<TRepository extends ITokenRepository> implements
 
         if (this.__repository instanceof TokenInMemoryRepository) {
             TokenInMemoryRepository castedRepo = (TokenInMemoryRepository) this.__repository;
-            castedRepo.GetBy((t -> t.getUnique_id().equals(id)));
+            castedRepo.GetBy((t -> t.getUser_id() == id));
         }
         if (this.__repository instanceof TokenJpaRepository) {
 

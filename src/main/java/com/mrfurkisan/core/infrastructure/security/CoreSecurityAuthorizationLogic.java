@@ -74,9 +74,9 @@ final class CoreSecurityAuthorizationLogic {
     }
 
     private static BaseResponse IsValidForAuthority(Role role, Authority level, RequestType requestType) {
-        
+
         if (!role.IsExist(requestType)) {
-            
+
             return new ErrorResponse("Forbidden action!");
         }
         if (!CoreSecurityAuthorizationLogic.IsItEnoughForAccess(role.getAccess_level(), level.AccessDimensionLevel())) {
@@ -96,7 +96,7 @@ final class CoreSecurityAuthorizationLogic {
         var roleDomainName = role.getDomain_name().toString();
         var isExist = false;
         if (authority.DomainAccess().equals(DomainAccessLevel.Public)) {
-            
+
             return true;
 
         }
@@ -140,18 +140,26 @@ final class CoreSecurityAuthorizationLogic {
                 continue;
             }
             var methodName = element.getMethodName();
-            var clss = element.getClass();
-            // class seviyesindeki annotation kontrolü için
-            classLevelAnnotation = clss.getAnnotation(Authority.class);
-            methodlevelAnnotation = null;
-            for (var method : clss.getDeclaredMethods()) {
+            Class<?> clss = null;
+            try {
 
-                if (method.getName() == methodName) {
-                    methodlevelAnnotation = method.getAnnotation(Authority.class);
-                    break;
+                clss = Class.forName(className);
+                classLevelAnnotation = clss.getAnnotation(Authority.class);
+                methodlevelAnnotation = null;
+                for (var method : clss.getDeclaredMethods()) {
+
+                    if (method.getName() == methodName) {
+                        methodlevelAnnotation = method.getAnnotation(Authority.class);
+                        break;
+                    }
                 }
+                break;
+
+            } catch (Exception e) {
+
             }
-            break;
+            // class seviyesindeki annotation kontrolü için
+
         }
         return new AuthorityDetails(classLevelAnnotation, methodlevelAnnotation);
 
@@ -162,8 +170,8 @@ final class CoreSecurityAuthorizationLogic {
         AuthorityDetails details = CoreSecurityAuthorizationLogic.CheckAuthorityAnnotations();
         if (details.classLevel() == null && details.methodLevel() == null) {
             return new ErrorResponse(
-    "Internal Error : Check the authority configuration of controllers, that error occurs on missing annotation declaring!");
-        }   
+                    "Internal Error : Check the authority configuration of controllers, that error occurs on missing annotation declaring!");
+        }
 
         /*
          * Class level kontrolü
