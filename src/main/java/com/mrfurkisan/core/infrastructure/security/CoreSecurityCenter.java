@@ -27,6 +27,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
         var loginForm = loginReq.GetData();
         var user = this.__userService.GetUserByEmail(loginForm.emailOrUsername());
+        
         var isEmailEntered = true;
         if (user == null) {
 
@@ -38,6 +39,8 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
             }
         }
+        //Açık oturum varsa kapatılıyor.
+        this.__tokenService.DeleteByUserId(user.getUser_id());
         // Ternary
         String userEmailOrUsername = (isEmailEntered) ? user.getEmail() : user.getUsername();
         // == operatörü hata verdi
@@ -57,10 +60,9 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (user != null) {
             return new ErrorResponse("Bu emaile kayitli zaten bir kullanici mevcut!");
         }
-        // AccessLevel.Authenticated standart giriş yapmış kullanıcı seviyesi olarak
-        // belirleniyor.
-        var authedRole = this.__authorManager.GetBy((role) -> role.getLevel() == AccessLevel.Authenticated);
-        var isOk = this.__userService.CreateUser(registerReq.GetData(), authedRole.getRole_id());
+
+        Role authedRole = this.__authorManager.GetRoleByDomain(DomainName.NORMAL);
+        var isOk = this.__userService.CreateUser(registerReq.GetData(), authedRole.getId());
         return (isOk == true)
                 ? new SuccessResponse("Kayit tamamlandi")
                 : new ErrorResponse("Kayit tamamlanirken bir hata oluştu!");
@@ -72,6 +74,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (token == null) {
             return new ErrorResponse("Geçersiz Token Kullanildi!");
         }
+        this.__tokenService.DeleteToken(token);
         return new SuccessResponse("Oturum kapatildi");
     }
 
@@ -81,7 +84,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
-        
+
         User user = this.__userService.GetUserById(tokenEntity.getUser_id());
         if (user.getPassword().equals(req.GetData())) {
             return new ErrorResponse("Yeni şifreniz bir öncekiyle ayni olamaz!");
@@ -158,7 +161,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
             return new ErrorResponse("Cannot Validated Token!");
         }
         // db sorguları
-        Role role = this.__authorManager.GetBy((e) -> e.getRole_id() == tokenEntity.getRole_id());
+        Role role = this.__authorManager.GetRoleById(tokenEntity.getRole_id());
 
         // Authorization'a özel bussiness logic işlemleri.
         return CoreSecurityAuthorizationLogic.ValidateAuthority(role, req.GetRequestType());

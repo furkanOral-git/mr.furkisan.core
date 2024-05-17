@@ -1,48 +1,39 @@
 package com.mrfurkisan.core.security.authorization;
 
-import java.util.List;
 
-import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
-import com.mrfurkisan.core.domain.interfaces.IEntity;
+import com.mrfurkisan.core.contracts.abstracts.RequestType;
+import com.mrfurkisan.core.domain.AggregateRoot;
+import com.mrfurkisan.core.domain.interfaces.IEntityAggregateRoot;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Entity
-@Data
-public final class Role implements IEntity {
+@Getter
+@Setter
+public final class Role extends AggregateRoot<RequestType, String> implements IEntityAggregateRoot {
 
-    @Id
-    private String role_id;
-    
-    private List<DomainName> domains;
-    private List<RequestTypesEnum> actions;
     private AccessLevel access_level;
-    
+    private DomainName domain_name;
 
     public Role(RolePrototype proto) {
 
-        super();
-        this.domains = proto.GetDomains();
-        this.actions = proto.GetActions();
+        super(proto.getId());
         this.access_level = proto.getLevel();
-        this.role_id = proto.getId();
-    }
-
-    public boolean IsExistDomain(DomainName name) {
-
-        return this.domains.contains(name);
+        this.domain_name = proto.getDomain_name();
 
     }
 
-    public AccessLevel getLevel() {
-        return this.access_level;
+    public Role(RoleEntity entity) {
+
+        super(entity.getRole_id());
+        this.access_level = entity.getAccess_level();
+        this.domain_name = entity.getDomain_name();
+
     }
 
-    public boolean CanYouDo(RequestTypesEnum action) {
-
-        return this.actions.contains(action);
+    @Override
+    public Boolean IsExist(RequestType entity) {
+        return this.getAggregate().contains(entity);
     }
 
 }

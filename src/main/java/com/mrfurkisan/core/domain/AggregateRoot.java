@@ -6,31 +6,36 @@ import java.util.ArrayList;
 import com.mrfurkisan.core.domain.functional.IVoidFunctionalInterface;
 
 import com.mrfurkisan.core.domain.interfaces.IAggregateRoot;
+import com.mrfurkisan.core.domain.interfaces.IAggregateRootItem;
 
-import com.mrfurkisan.core.domain.interfaces.IEntity;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class AggregateRoot<TEntity extends IEntity, TId> implements IAggregateRoot<TEntity, TId> {
+@Getter
+@Setter
+public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId> implements IAggregateRoot<TItem, TId> {
 
-    private ArrayList<TEntity> __aggregate;
-    private TId __id;
+    private ArrayList<TItem> aggregate;
+    private final TId id;
 
     public AggregateRoot(TId id) {
+        
         super();
-        this.__aggregate = new ArrayList<TEntity>();
-        this.__id = id;
+        this.aggregate = new ArrayList<TItem>();
+        this.id = id;
     }
 
     @Override
-    public void AddToRoot(TEntity entity) {
+    public void AddToRoot(TItem entity) {
 
-        this.__aggregate.add(entity);
+        this.aggregate.add(entity);
 
     }
 
     @Override
-    public void ForEach(IVoidFunctionalInterface<TEntity> callBack) {
+    public void ForEach(IVoidFunctionalInterface<TItem> callBack) {
 
-        for (TEntity tEntity : this.__aggregate) {
+        for (TItem tEntity : this.aggregate) {
 
             callBack.build(tEntity);
         }
@@ -38,9 +43,9 @@ public abstract class AggregateRoot<TEntity extends IEntity, TId> implements IAg
     }
 
     @Override
-    public void RemoveFromRoot(TEntity entity) {
+    public void RemoveFromRoot(TItem entity) {
 
-        this.__aggregate.remove(entity);
+        this.aggregate.remove(entity);
     }
 
     

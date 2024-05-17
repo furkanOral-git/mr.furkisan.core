@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
+import com.mrfurkisan.core.contracts.abstracts.RequestType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,32 +13,18 @@ import lombok.Setter;
 @Setter
 public final class RolePrototype {
 
-    private List<DomainName> names;
     private AccessLevel level;
-    private List<RequestTypesEnum> actions;
+    private final List<RequestType> actions;
     private final String id;
+    private DomainName domain_name;
 
     public RolePrototype() {
 
-        this.actions = new ArrayList<RequestTypesEnum>();
-        this.names = new ArrayList<DomainName>();
-        this.id =  UUID.randomUUID().toString();
+        this.actions = new ArrayList<RequestType>();
+        this.id = UUID.randomUUID().toString();
     }
-
-    public List<DomainName> GetDomains() {
-        return this.names;
-    }
-
-    public List<RequestTypesEnum> GetActions() {
-        return this.actions;
-    }
-
-    public void AddDomain(DomainName name) {
-
-        this.names.add(name);
-    }
-
-    public void AddAction(RequestTypesEnum action) {
+    
+    public void addAction(RequestType action) {
         this.actions.add(action);
     }
 

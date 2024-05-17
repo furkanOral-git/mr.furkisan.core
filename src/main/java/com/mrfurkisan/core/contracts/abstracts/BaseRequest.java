@@ -3,18 +3,18 @@ package com.mrfurkisan.core.contracts.abstracts;
 
 public abstract class BaseRequest {
     
-    private RequestTypesEnum __requestType;
+    private RequestType __requestType;
     private String __onVersion;
     
 
-    public BaseRequest(RequestTypesEnum requestType, String onVersion) {
+    public BaseRequest(RequestType requestType, String onVersion) {
         super();
         this.__requestType = requestType;
         this.__onVersion = onVersion;
         
     }
 
-    public RequestTypesEnum GetRequestType() {
+    public RequestType GetRequestType() {
         return this.__requestType;
     }
 

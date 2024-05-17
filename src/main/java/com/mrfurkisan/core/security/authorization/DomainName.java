@@ -1,22 +1,31 @@
 package com.mrfurkisan.core.security.authorization;
 
+
 public enum DomainName {
     
-    PRODUCT,
-    SHIPMENT,
-    PAYMENT,
+    PRODUCT_MANAGER,
+    PRODUCT_OWNER,
+    DEMO_OWNER,
+    SHIPMENT_MANAGER,
+    SHIPMENT_WORKER,
+    PAYMENT_MANAGER,
+    PAYMENT_WORKER,
+    USER_MANAGER,
     USER,
     CUSTOMER,
-    CLASS,
+    CUSTOMER_MANAGER,
     STUDENT,
     TEACHER,
-    STOCK,
-    EMPLOYEE,
-    ACOUNT,
+    STOCK_MANAGER,
+    EMPLOYEE_MANAGER,
+    ACOUNT_MANAGER,
     PARTICIPANT,
-    ROOM,
+    ROOM_MANAGER,
+    ROOM_MEMBER,
+    TEAM_MANAGER,
+    TEAM_MEMBER,
     AUTHOR,
     READER,
-    PRESCRİPTİVE, //Kural Koyucu demek
-    PEOPLE
+    PRESCRİPTİVE,
+    NORMAL
 }

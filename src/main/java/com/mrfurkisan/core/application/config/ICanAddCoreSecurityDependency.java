@@ -1,9 +1,6 @@
 package com.mrfurkisan.core.application.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.mrfurkisan.core.application.auth.*;
-
 
 //Ability
 public interface ICanAddCoreSecurityDependency {
@@ -12,10 +9,10 @@ public interface ICanAddCoreSecurityDependency {
 
     public IUserService getUserService(IUserRepository repository);
 
-    public IAuthorizationService getAuthorizationService(@Autowired IRoleRepository repo) ;
+    public IAuthorizationService getAuthorizationService(IRoleRepository repo, IRoleEntityRepository entityRepo);
 
-    public ISecurityCenter getSecurityCenter(@Autowired ITokenService tokenService, @Autowired IUserService userService,
-            @Autowired IAuthorizationService authorizationService);
+    public ISecurityCenter getSecurityCenter(ITokenService tokenService, IUserService userService,
+            IAuthorizationService authorizationService);
 
     public ITokenRepository getTokenRepository();
 
@@ -23,6 +20,6 @@ public interface ICanAddCoreSecurityDependency {
 
     public IRoleRepository getRoleRepository();
 
-    
+    public IRoleEntityRepository getRoleEntityRepository();
 
 }

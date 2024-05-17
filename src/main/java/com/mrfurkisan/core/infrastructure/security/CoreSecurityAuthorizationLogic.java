@@ -1,7 +1,7 @@
 package com.mrfurkisan.core.infrastructure.security;
 
 import com.mrfurkisan.core.contracts.abstracts.BaseResponse;
-import com.mrfurkisan.core.contracts.abstracts.RequestTypesEnum;
+import com.mrfurkisan.core.contracts.abstracts.RequestType;
 import com.mrfurkisan.core.contracts.responses.ErrorResponse;
 import com.mrfurkisan.core.contracts.responses.SuccessResponse;
 import com.mrfurkisan.core.security.authorization.AccessDimensionLevel;
@@ -73,13 +73,13 @@ final class CoreSecurityAuthorizationLogic {
 
     }
 
-    private static BaseResponse IsValidForAuthority(Role role, Authority level, RequestTypesEnum requestType) {
-
-        if (!role.CanYouDo(requestType)) {
+    private static BaseResponse IsValidForAuthority(Role role, Authority level, RequestType requestType) {
+        
+        if (!role.IsExist(requestType)) {
+            
             return new ErrorResponse("Forbidden action!");
         }
-
-        if (!CoreSecurityAuthorizationLogic.IsItEnoughForAccess(role.getLevel(), level.AccessDimensionLevel())) {
+        if (!CoreSecurityAuthorizationLogic.IsItEnoughForAccess(role.getAccess_level(), level.AccessDimensionLevel())) {
             return new ErrorResponse("Not Authorized");
         }
 
@@ -90,24 +90,26 @@ final class CoreSecurityAuthorizationLogic {
         return new SuccessResponse("Başarili");
     }
 
-    private static Boolean CheckDomainNameAndDomainAccess(Role role, Authority level) {
+    private static Boolean CheckDomainNameAndDomainAccess(Role role, Authority authority) {
 
-        var access = level.DomainAccess();
-        Boolean itWllPass = false;
+        var domains = authority.OpenTo();
+        var roleDomainName = role.getDomain_name().toString();
+        var isExist = false;
+        if (authority.DomainAccess().equals(DomainAccessLevel.Public)) {
+            
+            return true;
 
-        if (access == DomainAccessLevel.DomainNameOnly) {
-
-            for (var domain : level.DomainName()) {
-
-                if (role.IsExistDomain(domain)) {
-                    itWllPass = true;
-                    break;
-                }
-                ;
-            }
-            return itWllPass;
         }
-        return true;
+        for (int i = 0; i <= domains.length; i++) {
+
+            if (domains[i].name().equals(roleDomainName)) {
+
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
+
     }
 
     private static AuthorityDetails CheckAuthorityAnnotations() {
@@ -154,14 +156,14 @@ final class CoreSecurityAuthorizationLogic {
         return new AuthorityDetails(classLevelAnnotation, methodlevelAnnotation);
 
     }
-    
-    public static BaseResponse ValidateAuthority(Role role, RequestTypesEnum req) {
+
+    public static BaseResponse ValidateAuthority(Role role, RequestType req) {
 
         AuthorityDetails details = CoreSecurityAuthorizationLogic.CheckAuthorityAnnotations();
         if (details.classLevel() == null && details.methodLevel() == null) {
             return new ErrorResponse(
-                    "Internal Error : Check the authority configuration of controllers, that error occurs on missing annotation declaring!");
-        }
+    "Internal Error : Check the authority configuration of controllers, that error occurs on missing annotation declaring!");
+        }   
 
         /*
          * Class level kontrolü

@@ -4,7 +4,7 @@ public abstract class BaseDataRequest<TData> extends BaseRequest {
 
     private TData __data;
 
-    public BaseDataRequest(RequestTypesEnum requestType, String onVersion, TData data) {
+    public BaseDataRequest(RequestType requestType, String onVersion, TData data) {
 
         super(requestType, onVersion);
         this.__data = data;

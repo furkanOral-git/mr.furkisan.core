@@ -13,6 +13,6 @@ public @interface Authority {
 
     DomainAccessLevel DomainAccess() default DomainAccessLevel.Public;
 
-    DomainName[] DomainName() default DomainName.USER;
+    DomainName[] OpenTo() default DomainName.USER;
 
 }

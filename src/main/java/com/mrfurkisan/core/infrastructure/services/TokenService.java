@@ -75,6 +75,7 @@ public final class TokenService<TRepository extends ITokenRepository> implements
             castedRepo.Add(securityTokenEntity);
         }
         if (this.__repository instanceof TokenJpaRepository) {
+
             TokenJpaRepository castedRepo = (TokenJpaRepository) this.__repository;
             castedRepo.Add(securityTokenEntity);
         }
@@ -108,6 +109,52 @@ public final class TokenService<TRepository extends ITokenRepository> implements
             castedRepo.Delete(filter);
         }
 
+    }
+
+    @Override
+    public void DeleteByUserId(int id) {
+
+        if (this.__repository instanceof TokenInMemoryRepository) {
+            TokenInMemoryRepository castedRepo = (TokenInMemoryRepository) this.__repository;
+            castedRepo.GetBy((t -> t.getUnique_id().equals(id)));
+        }
+        if (this.__repository instanceof TokenJpaRepository) {
+
+            TokenJpaRepository castedRepo = (TokenJpaRepository) this.__repository;
+            IJpaFunctionalInterface<SecurityTokenEntity, CriteriaDelete<SecurityTokenEntity>> filter = (
+                    CriteriaBuilder builder) -> {
+                CriteriaDelete<SecurityTokenEntity> delete = builder.createCriteriaDelete(SecurityTokenEntity.class);
+                Root<SecurityTokenEntity> table = delete.from(SecurityTokenEntity.class);
+
+                delete.where(builder.equal(table.get("user_id"), id));
+                return delete;
+            };
+            castedRepo.Delete(filter);
+        }
+    }
+
+    @Override
+    public SecurityTokenEntity GetEntityByUserId(int id) {
+        SecurityTokenEntity entity = null;
+        if (this.__repository instanceof TokenInMemoryRepository) {
+
+            TokenInMemoryRepository castedRepo = (TokenInMemoryRepository) this.__repository;
+            entity = castedRepo.GetBy((t -> t.getUser_id() == id));
+        }
+        if (this.__repository instanceof TokenJpaRepository) {
+
+            TokenJpaRepository castedRepo = (TokenJpaRepository) this.__repository;
+            IJpaFunctionalInterface<SecurityTokenEntity, CriteriaQuery<SecurityTokenEntity>> filter = (
+                    CriteriaBuilder builder) -> {
+                CriteriaQuery<SecurityTokenEntity> query = builder.createQuery(SecurityTokenEntity.class);
+                Root<SecurityTokenEntity> table = query.from(SecurityTokenEntity.class);
+
+                query.where(builder.equal(table.get("user_id"), id));
+                return query;
+            };
+            entity = castedRepo.GetBy(filter);
+        }
+        return entity;
     }
 
 }

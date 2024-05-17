@@ -10,5 +10,9 @@ public interface ITokenService extends IApplicationService {
 
     public void DeleteToken(SecurityTokenEntity tokenEntity);
 
+    public void DeleteByUserId(int id);
+
+    public SecurityTokenEntity GetEntityByUserId(int id);
+
     public SecurityTokenEntity GetEntityByTokenId(String token);
 }
