@@ -11,21 +11,20 @@ import java.util.List;
 
 @Getter
 @Setter
-public abstract class BaseContext<TEntityAggregateRoot extends IEntityAggregateRoot> implements IApplicationContext{
-    
+public abstract class BaseContext<TEntityAggregateRoot extends IEntityAggregateRoot> implements IApplicationContext {
+
     private List<TEntityAggregateRoot> context;
-    
-    private BaseContext() {
+
+    protected BaseContext() {
         super();
     }
-   
+
     public void AddToContext(TEntityAggregateRoot entity) {
 
         this.context.add(entity);
 
     }
 
-    
     public void ForEach(IVoidFunctionalInterface<TEntityAggregateRoot> callBack) {
 
         for (TEntityAggregateRoot tEntity : this.context) {
@@ -34,15 +33,16 @@ public abstract class BaseContext<TEntityAggregateRoot extends IEntityAggregateR
         }
 
     }
-
     
-    public void RemoveFromRoot(TEntityAggregateRoot entity) {
+
+    public void RemoveFromContext(TEntityAggregateRoot entity) {
 
         this.context.remove(entity);
     }
 
-    
     public Boolean IsExist(TEntityAggregateRoot entity) {
         return this.context.contains(entity);
     }
+    
+    
 }

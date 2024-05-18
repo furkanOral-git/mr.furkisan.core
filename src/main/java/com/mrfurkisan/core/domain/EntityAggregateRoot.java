@@ -1,37 +1,34 @@
 package com.mrfurkisan.core.domain;
 
-import java.util.List;
-
 import com.mrfurkisan.core.domain.functional.IVoidFunctionalInterface;
-
-import com.mrfurkisan.core.domain.interfaces.IAggregateRoot;
 import com.mrfurkisan.core.domain.interfaces.IAggregateRootItem;
+import com.mrfurkisan.core.domain.interfaces.IEntityAggregateRoot;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId>
-        implements IAggregateRoot<TItem, TId> {
+public abstract class EntityAggregateRoot<TEntityAggregateRoot extends IEntityAggregateRoot, TItem extends IAggregateRootItem>
+        implements IEntityAggregateRoot {
 
+    private final TEntityAggregateRoot entity;
     private List<TItem> aggregate;
-    private TId id;
-    
-    public AggregateRoot() {
+
+    public EntityAggregateRoot(TEntityAggregateRoot entity) {
 
         super();
-        
+        this.entity = entity;
     }
 
-    @Override
     public void AddToRoot(TItem entity) {
 
         this.aggregate.add(entity);
 
     }
 
-    @Override
     public void ForEach(IVoidFunctionalInterface<TItem> callBack) {
 
         for (TItem tEntity : this.aggregate) {
@@ -41,13 +38,11 @@ public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId>
 
     }
 
-    @Override
     public void RemoveFromRoot(TItem entity) {
 
         this.aggregate.remove(entity);
     }
 
-    @Override
     public Boolean IsExist(TItem entity) {
         return this.aggregate.contains(entity);
     }

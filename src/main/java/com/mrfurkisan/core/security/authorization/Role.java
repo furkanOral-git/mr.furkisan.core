@@ -17,7 +17,7 @@ public final class Role extends AggregateRoot<RequestType, String> implements IE
 
     public Role(RolePrototype proto) {
 
-        super(proto.getId());
+        this.setId(proto.getId());
         this.access_level = proto.getLevel();
         this.domain_name = proto.getDomain_name();
 
@@ -25,7 +25,7 @@ public final class Role extends AggregateRoot<RequestType, String> implements IE
 
     public Role(RoleEntity entity) {
 
-        super(entity.getRole_id());
+        this.setId(entity.getRole_id());
         this.access_level = entity.getAccess_level();
         this.domain_name = entity.getDomain_name();
 
