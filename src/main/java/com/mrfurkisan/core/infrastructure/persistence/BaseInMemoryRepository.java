@@ -7,6 +7,7 @@ import java.util.List;
 import com.mrfurkisan.core.domain.functional.IInMemoryFunctionalInterface;
 import com.mrfurkisan.core.domain.interfaces.IEntity;
 
+
 public abstract class BaseInMemoryRepository<TEntity extends IEntity, TId>{
 
     private final List<TEntity> __repo;

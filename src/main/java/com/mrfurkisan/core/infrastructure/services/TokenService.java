@@ -2,6 +2,8 @@ package com.mrfurkisan.core.infrastructure.services;
 
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import com.mrfurkisan.core.application.auth.ITokenRepository;
 import com.mrfurkisan.core.application.auth.ITokenService;
 import com.mrfurkisan.core.domain.functional.IJpaFunctionalInterface;
@@ -13,6 +15,7 @@ import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+
 
 public final class TokenService<TRepository extends ITokenRepository> implements ITokenService {
 
@@ -106,7 +109,7 @@ public final class TokenService<TRepository extends ITokenRepository> implements
 
             };
 
-            castedRepo.Delete(filter);
+            castedRepo.DeleteBy(filter);
         }
 
     }
@@ -129,7 +132,7 @@ public final class TokenService<TRepository extends ITokenRepository> implements
                 delete.where(builder.equal(table.get("user_id"), id));
                 return delete;
             };
-            castedRepo.Delete(filter);
+            castedRepo.DeleteBy(filter);
         }
     }
 
@@ -155,6 +158,15 @@ public final class TokenService<TRepository extends ITokenRepository> implements
             entity = castedRepo.GetBy(filter);
         }
         return entity;
+    }
+    @Override
+    public int ValidateTokenAndReturnUserId(String token) {
+
+        var tok = this.GetEntityByTokenId(token);
+        if (tok == null) {
+            return -1;
+        }
+        return tok.getUser_id();
     }
 
 }

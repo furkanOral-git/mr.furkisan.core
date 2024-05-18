@@ -2,6 +2,8 @@ package com.mrfurkisan.core.infrastructure.services;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.mrfurkisan.core.application.auth.IAuthorizationService;
 import com.mrfurkisan.core.application.auth.IRoleEntityRepository;
 import com.mrfurkisan.core.application.auth.IRoleRepository;
@@ -22,6 +24,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+
 
 public class AuthorizationService implements IAuthorizationService {
 
@@ -130,7 +133,7 @@ public class AuthorizationService implements IAuthorizationService {
 
             return update;
         };
-        this.__entityRepo.Update(filter);
+        this.__entityRepo.UpdateBy(filter);
 
     }
 
@@ -146,7 +149,7 @@ public class AuthorizationService implements IAuthorizationService {
 
             return update;
         };
-        this.__entityRepo.Update(filter);
+        this.__entityRepo.UpdateBy(filter);
 
     }
 
@@ -161,7 +164,7 @@ public class AuthorizationService implements IAuthorizationService {
             delete.where(builder.equal(table.get("role_id"), id));
             return delete;
         };
-        this.__entityRepo.Delete(filter);
+        this.__entityRepo.DeleteBy(filter);
     }
 
     @Override

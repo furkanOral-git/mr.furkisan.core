@@ -2,14 +2,13 @@ package com.mrfurkisan.core.infrastructure.persistence;
 
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
+
 
 import com.mrfurkisan.core.domain.functional.IJpaFunctionalInterface;
 import com.mrfurkisan.core.domain.interfaces.IEntity;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.criteria.CriteriaDelete;
@@ -17,8 +16,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import org.springframework.transaction.annotation.Transactional;
 
-@Repository
-@Inheritance(strategy = InheritanceType.JOINED)
+
+
 public abstract class BaseJpaRepository<TEntity extends IEntity> {
 
     private final Class<TEntity> __type;
@@ -40,7 +39,7 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
     }
     
     @Transactional
-    public int Update(IJpaFunctionalInterface<TEntity, CriteriaUpdate<TEntity>> filter) {
+    public int UpdateBy(IJpaFunctionalInterface<TEntity, CriteriaUpdate<TEntity>> filter) {
 
         var builder = this.__manager.getCriteriaBuilder();
         CriteriaUpdate<TEntity> update = filter.build(builder);
@@ -48,7 +47,7 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
     }
     
     @Transactional
-    public int Delete(IJpaFunctionalInterface<TEntity, CriteriaDelete<TEntity>> filter) {
+    public int DeleteBy(IJpaFunctionalInterface<TEntity, CriteriaDelete<TEntity>> filter) {
 
         var builder = this.__manager.getCriteriaBuilder();
         CriteriaDelete<TEntity> delete = filter.build(builder);

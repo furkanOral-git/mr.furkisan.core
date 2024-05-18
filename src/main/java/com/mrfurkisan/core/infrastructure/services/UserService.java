@@ -2,6 +2,8 @@ package com.mrfurkisan.core.infrastructure.services;
 
 import java.util.UUID;
 
+
+
 import com.mrfurkisan.core.application.auth.IUserRepository;
 import com.mrfurkisan.core.application.auth.IUserService;
 import com.mrfurkisan.core.application.forms.RegisterForm;
@@ -15,6 +17,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+
+
 
 public final class UserService<TRepository extends IUserRepository> implements IUserService {
 
@@ -62,7 +66,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 delete.where(builder.equal(table.get("user_id"), userId));
                 return delete;
             };
-            castedRepo.Delete(filter);
+            castedRepo.DeleteBy(filter);
             return true;
         }
         return false;
@@ -86,7 +90,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 return update;
 
             };
-            castedRepo.Update(filter);
+            castedRepo.UpdateBy(filter);
 
             return true;
 
@@ -112,7 +116,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 return update;
 
             };
-            castedRepo.Update(filter);
+            castedRepo.UpdateBy(filter);
 
             return true;
 
@@ -138,7 +142,7 @@ public final class UserService<TRepository extends IUserRepository> implements I
                 return update;
 
             };
-            castedRepo.Update(filter);
+            castedRepo.UpdateBy(filter);
         }
         return true;
     }

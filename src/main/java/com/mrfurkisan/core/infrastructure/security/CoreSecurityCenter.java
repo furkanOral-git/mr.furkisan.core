@@ -1,5 +1,8 @@
 package com.mrfurkisan.core.infrastructure.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.mrfurkisan.core.application.auth.*;
 import com.mrfurkisan.core.application.forms.*;
 import com.mrfurkisan.core.contracts.abstracts.*;
@@ -9,11 +12,15 @@ import com.mrfurkisan.core.infrastructure.services.AuthorizationService;
 import com.mrfurkisan.core.security.authentication.*;
 import com.mrfurkisan.core.security.authorization.*;
 
+
 public final class CoreSecurityCenter implements ISecurityCenter {
 
+    @Autowired
     private final ITokenService __tokenService;
+    @Autowired
     private final IUserService __userService;
-    private final AuthorizationService __authorManager;
+    @Autowired
+    private final IAuthorizationService __authorManager;
 
     public CoreSecurityCenter(ITokenService tokenService, IUserService userService, IAuthorizationService builder) {
         super();
@@ -23,11 +30,11 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     }
 
-    public BaseDataResponse<SecurityToken> Verify(FreeDataRequest<LoginForm> loginReq) {
+    public BaseDataResponse<SecurityToken> Login(FreeDataRequest<LoginForm> loginReq) {
 
         var loginForm = loginReq.GetData();
         var user = this.__userService.GetUserByEmail(loginForm.emailOrUsername());
-        
+
         var isEmailEntered = true;
         if (user == null) {
 
@@ -39,7 +46,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
             }
         }
-        //Açık oturum varsa kapatılıyor.
+        // Açık oturum varsa kapatılıyor.
         this.__tokenService.DeleteByUserId(user.getUser_id());
         // Ternary
         String userEmailOrUsername = (isEmailEntered) ? user.getEmail() : user.getUsername();
@@ -70,7 +77,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     public BaseResponse Logout(SecureRequest req) {
 
-        var token = this.Validate(req.GetToken().GetId());
+        var token = this.Vertificate(req.GetToken().GetId());
         if (token == null) {
             return new ErrorResponse("Geçersiz Token Kullanildi!");
         }
@@ -80,7 +87,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     public BaseResponse ChangePassword(SecureDataRequest<String> req) {
 
-        SecurityTokenEntity tokenEntity = this.Validate(req.GetToken().GetId());
+        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
@@ -101,7 +108,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     public BaseResponse ChangeEmail(SecureDataRequest<String> req) {
 
-        SecurityTokenEntity tokenEntity = this.Validate(req.GetToken().GetId());
+        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
 
         if (tokenEntity == null) {
 
@@ -120,7 +127,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         return new ErrorResponse("Email değiştirilirken bir hata oluştu!");
     }
 
-    private SecurityTokenEntity Validate(String id) {
+    private SecurityTokenEntity Vertificate(String id) {
 
         // Authentication doğrulama işlemleri burada yapılacak
         SecurityTokenEntity tokenEntity = this.__tokenService.GetEntityByTokenId(id);
@@ -135,7 +142,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     public BaseResponse ChangeUserName(SecureDataRequest<String> req) {
         // Authenticate olmuş mu bu kontrol ediliyor.
-        SecurityTokenEntity tokenEntity = this.Validate(req.GetToken().GetId());
+        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
 
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
@@ -155,12 +162,12 @@ public final class CoreSecurityCenter implements ISecurityCenter {
 
     public BaseResponse AuthorizationValidation(SecureRequest req) {
 
-        SecurityTokenEntity tokenEntity = this.Validate(req.GetToken().GetId());
+        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
 
         if (tokenEntity == null) {
             return new ErrorResponse("Cannot Validated Token!");
         }
-        //Role null geliyor!!
+        // Role null geliyor!!
         Role role = this.__authorManager.GetRoleById(tokenEntity.getRole_id());
 
         // Authorization'a özel bussiness logic işlemleri.
