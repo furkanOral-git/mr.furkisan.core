@@ -1,7 +1,6 @@
 package com.mrfurkisan.core.domain;
 
-import java.util.ArrayList;
-
+import java.util.List;
 
 import com.mrfurkisan.core.domain.functional.IVoidFunctionalInterface;
 
@@ -13,15 +12,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId> implements IAggregateRoot<TItem, TId> {
+public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId>
+        implements IAggregateRoot<TItem, TId> {
 
-    private ArrayList<TItem> aggregate;
+    private List<TItem> aggregate;
     private final TId id;
 
     public AggregateRoot(TId id) {
-        
+
         super();
-        this.aggregate = new ArrayList<TItem>();
         this.id = id;
     }
 
@@ -48,6 +47,9 @@ public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId> imple
         this.aggregate.remove(entity);
     }
 
-    
+    @Override
+    public Boolean IsExist(TItem entity) {
+        return this.aggregate.contains(entity);
+    }
 
 }

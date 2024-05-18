@@ -6,6 +6,7 @@ public enum DomainName {
     PRODUCT_MANAGER,
     PRODUCT_OWNER,
     DEMO_OWNER,
+    GUEST,
     SHIPMENT_MANAGER,
     SHIPMENT_WORKER,
     PAYMENT_MANAGER,
@@ -25,6 +26,7 @@ public enum DomainName {
     TEAM_MANAGER,
     TEAM_MEMBER,
     AUTHOR,
+    JUNIOUR_AUTHOR,
     READER,
     PRESCRİPTİVE,
     NORMAL

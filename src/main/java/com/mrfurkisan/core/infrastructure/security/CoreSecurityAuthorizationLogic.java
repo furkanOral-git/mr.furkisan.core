@@ -182,17 +182,13 @@ final class CoreSecurityAuthorizationLogic {
 
         Authority classLevel = details.classLevel();
         Authority methodLevel = details.methodLevel();
-        if (methodLevel == null) {
+        if (methodLevel != null) {
+
+            return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, methodLevel, req);
+        }
+        if (classLevel != null) {
 
             return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, classLevel, req);
-        }
-        if (classLevel == null) {
-
-            return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, methodLevel, req);
-        }
-        if (methodLevel != null && classLevel != null) {
-
-            return CoreSecurityAuthorizationLogic.IsValidForAuthority(role, methodLevel, req);
         }
         return new ErrorResponse("Not Authorized!");
     }
