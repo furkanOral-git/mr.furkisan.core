@@ -17,11 +17,11 @@ public abstract class AggregateRoot<TItem extends IAggregateRootItem, TId>
 
     private List<TItem> aggregate;
     private TId id;
-    
+
     public AggregateRoot() {
 
         super();
-        
+
     }
 
     @Override

@@ -2,8 +2,6 @@ package com.mrfurkisan.core.infrastructure.persistence;
 
 import java.util.List;
 
-
-
 import com.mrfurkisan.core.domain.functional.IJpaFunctionalInterface;
 import com.mrfurkisan.core.domain.interfaces.IEntity;
 
@@ -14,9 +12,8 @@ import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
+
 import org.springframework.transaction.annotation.Transactional;
-
-
 
 public abstract class BaseJpaRepository<TEntity extends IEntity> {
 
@@ -30,14 +27,17 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
         this.__manager = manager;
         this.__type = type;
     }
-    //@Transactional herhangi bir işlemin kesilmesi durumunda değişiklikleri geri almaya yarayan bir bağlam.
-    //EntityManager'ı direkt kullanırken bunu eklemek zorunlu kılınıyor!
+
+    // @Transactional herhangi bir işlemin kesilmesi durumunda değişiklikleri geri
+    // almaya yarayan bir bağlam.
+    // EntityManager'ı direkt kullanırken bunu eklemek zorunlu kılınıyor!
     @Transactional
     public void Add(TEntity entity) {
 
-       this.__manager.persist(entity);
+        this.__manager.merge(entity);
+
     }
-    
+
     @Transactional
     public int UpdateBy(IJpaFunctionalInterface<TEntity, CriteriaUpdate<TEntity>> filter) {
 
@@ -45,7 +45,7 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
         CriteriaUpdate<TEntity> update = filter.build(builder);
         return this.__manager.createQuery(update).executeUpdate();
     }
-    
+
     @Transactional
     public int DeleteBy(IJpaFunctionalInterface<TEntity, CriteriaDelete<TEntity>> filter) {
 
@@ -83,21 +83,20 @@ public abstract class BaseJpaRepository<TEntity extends IEntity> {
         try {
 
             entity = this.__manager.createQuery(query).getSingleResult();
-            
 
         } catch (Exception e) {
-            
-            if(e instanceof NoResultException){
-                
+
+            if (e instanceof NoResultException) {
+
                 return entity;
             }
-            if(e instanceof NonUniqueResultException){
+            if (e instanceof NonUniqueResultException) {
                 return entity;
             }
-            
+
         }
         return entity;
-        
+
     }
 
 }
