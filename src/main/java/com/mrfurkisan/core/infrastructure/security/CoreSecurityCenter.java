@@ -1,17 +1,16 @@
 package com.mrfurkisan.core.infrastructure.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.mrfurkisan.core.application.auth.*;
 import com.mrfurkisan.core.application.forms.*;
 import com.mrfurkisan.core.contracts.abstracts.*;
 import com.mrfurkisan.core.contracts.requests.*;
 import com.mrfurkisan.core.contracts.responses.*;
-import com.mrfurkisan.core.infrastructure.services.AuthorizationService;
+import com.mrfurkisan.core.infrastructure.security.messages.SessionErrorMessages;
+import com.mrfurkisan.core.infrastructure.security.messages.SessionSuccessMessages;
 import com.mrfurkisan.core.security.authentication.*;
 import com.mrfurkisan.core.security.authorization.*;
-
 
 public final class CoreSecurityCenter implements ISecurityCenter {
 
@@ -26,7 +25,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         super();
         this.__userService = userService;
         this.__tokenService = tokenService;
-        this.__authorManager = (AuthorizationService) builder;
+        this.__authorManager = builder;
 
     }
 
@@ -42,7 +41,7 @@ public final class CoreSecurityCenter implements ISecurityCenter {
             isEmailEntered = false;
             if (user == null) {
 
-                return new ErrorDataResponse<SecurityToken>("Böyle bir kullanici yok");
+                return new ErrorDataResponse<SecurityToken>(SessionErrorMessages.NotExistUsernameOrEmail);
 
             }
         }
@@ -53,10 +52,10 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         // == operatörü hata verdi
         return (userEmailOrUsername.equals(loginForm.emailOrUsername())
                 && user.getPassword().equals(loginForm.password()))
-                        ? new SuccessDataResponse<SecurityToken>("Authenticated",
+                        ? new SuccessDataResponse<SecurityToken>(SessionSuccessMessages.Login,
                                 this.__tokenService.CreateToken(user.getUser_id(), user.getRole_id(),
                                         loginForm.macAddress()))
-                        : new ErrorDataResponse<SecurityToken>("Kullanici adi ya da şifrenizi yanliş girdiniz!");
+                        : new ErrorDataResponse<SecurityToken>(SessionErrorMessages.NotAuhenticated);
 
     }
 
@@ -65,114 +64,126 @@ public final class CoreSecurityCenter implements ISecurityCenter {
         var form = registerReq.GetData();
         var user = this.__userService.GetUserByEmail(form.email());
         if (user != null) {
-            return new ErrorResponse("Bu emaile kayitli zaten bir kullanici mevcut!");
+            return new ErrorResponse(SessionErrorMessages.ExistEmail);
         }
 
         Role authedRole = this.__authorManager.GetRoleByDomain(DomainName.NORMAL);
         var isOk = this.__userService.CreateUser(registerReq.GetData(), authedRole.getId());
         return (isOk == true)
-                ? new SuccessResponse("Kayit tamamlandi")
-                : new ErrorResponse("Kayit tamamlanirken bir hata oluştu!");
+                ? new SuccessResponse(SessionSuccessMessages.SignIn)
+                : new ErrorResponse(SessionErrorMessages.SignIn);
     }
 
     public BaseResponse Logout(SecureRequest req) {
 
-        var token = this.Vertificate(req.GetToken().GetId());
-        if (token == null) {
-            return new ErrorResponse("Geçersiz Token Kullanildi!");
+        BaseDataResponse<SecurityTokenEntity> validationResult = this.BaseValidateAccessRequest(req.GetToken().GetId(),
+                req.GetRequestType());
+
+        if (!validationResult.GetSuccess()) {
+            return validationResult;
         }
-        this.__tokenService.DeleteToken(token);
-        return new SuccessResponse("Oturum kapatildi");
+
+        SecurityTokenEntity tokenEntity = validationResult.GetData();
+
+        this.__tokenService.DeleteToken(tokenEntity);
+
+        return new SuccessResponse(SessionSuccessMessages.Logout);
     }
 
     public BaseResponse ChangePassword(SecureDataRequest<String> req) {
 
-        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
-        if (tokenEntity == null) {
-            return new ErrorResponse("Cannot Validated Token!");
+        BaseDataResponse<SecurityTokenEntity> validationResult = this.BaseValidateAccessRequest(req.GetToken().GetId(),
+                req.GetRequestType());
+
+        if (!validationResult.GetSuccess()) {
+            return validationResult;
         }
+        SecurityTokenEntity tokenEntity = validationResult.GetData();
 
         User user = this.__userService.GetUserById(tokenEntity.getUser_id());
         if (user.getPassword().equals(req.GetData())) {
-            return new ErrorResponse("Yeni şifreniz bir öncekiyle ayni olamaz!");
+            return new ErrorResponse(SessionErrorMessages.SamePassword);
         }
 
         var success = this.__userService.ChangePassword(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
-            this.__tokenService.DeleteToken(tokenEntity);
-            return new SuccessResponse("Şifre başariyla değiştirildi!");
+            return new SuccessResponse(SessionSuccessMessages.ChangePassword);
         }
-        return new ErrorResponse("Şifreniz değiştirilirken bir hata oluştu!");
+        return new ErrorResponse(SessionErrorMessages.ChangePassword);
     }
 
     public BaseResponse ChangeEmail(SecureDataRequest<String> req) {
 
-        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
+        BaseDataResponse<SecurityTokenEntity> validationResult = this.BaseValidateAccessRequest(req.GetToken().GetId(),
+                req.GetRequestType());
 
-        if (tokenEntity == null) {
-
-            return new ErrorResponse("Cannot Validated Token!");
+        if (!validationResult.GetSuccess()) {
+            return validationResult;
         }
+
+        SecurityTokenEntity tokenEntity = validationResult.GetData();
         var searchResult = this.__userService.GetUserByEmail(req.GetData());
+
         if (searchResult != null) {
-            return new ErrorResponse("Girdiğiniz email zaten kayitli!");
+            return new ErrorResponse(SessionErrorMessages.ExistEmail);
         }
         var success = this.__userService.ChangeEmail(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
             this.__tokenService.DeleteToken(tokenEntity);
-            return new SuccessResponse("Email başariyla değiştirildi!");
+            return new SuccessResponse(SessionSuccessMessages.ChangeEmail);
         }
-        return new ErrorResponse("Email değiştirilirken bir hata oluştu!");
-    }
-
-    private SecurityTokenEntity Vertificate(String id) {
-
-        // Authentication doğrulama işlemleri burada yapılacak
-        SecurityTokenEntity tokenEntity = this.__tokenService.GetEntityByTokenId(id);
-        /*
-         * ilerleyen zamanlarda mac adresi doğrulama, eğer eşit değilse email ve şifre
-         * isteme gibi güvenliği kanıtlamaya dayalı işlemler burada yer alacak.
-         * email doğrulaması,sms doğrulaması gibi...
-         */
-        return tokenEntity;
-
+        return new ErrorResponse(SessionErrorMessages.ChangeEmail);
     }
 
     public BaseResponse ChangeUserName(SecureDataRequest<String> req) {
         // Authenticate olmuş mu bu kontrol ediliyor.
-        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
 
-        if (tokenEntity == null) {
-            return new ErrorResponse("Cannot Validated Token!");
+        BaseDataResponse<SecurityTokenEntity> validationResult = this.BaseValidateAccessRequest(req.GetToken().GetId(),
+                req.GetRequestType());
+
+        if (!validationResult.GetSuccess()) {
+            return validationResult;
         }
+
+        SecurityTokenEntity tokenEntity = validationResult.GetData();
+
         var searchResult = this.__userService.GetUserByUsername(req.GetData());
         if (searchResult != null) {
-            return new ErrorResponse("Girdiğiniz kullanici adi kullaniliyor!");
+            return new ErrorResponse(SessionErrorMessages.ExistUsername);
         }
         var success = this.__userService.ChangeUsername(tokenEntity.getUser_id(), req.GetData());
         if (success) {
 
-            this.__tokenService.DeleteToken(tokenEntity);
-            return new SuccessResponse("Username başariyla değiştirildi!");
+            return new SuccessResponse(SessionSuccessMessages.ChangeUsername);
         }
-        return new ErrorResponse("Username değiştirilirken bir hata oluştu!");
+        return new ErrorResponse(SessionErrorMessages.ChangeUsername);
     }
 
-    public BaseResponse AuthorizationValidation(SecureRequest req) {
+    public BaseResponse ValidateAccessRequest(SecureRequest req) {
 
-        SecurityTokenEntity tokenEntity = this.Vertificate(req.GetToken().GetId());
+        BaseDataResponse<SecurityTokenEntity> result = this.BaseValidateAccessRequest(req.GetToken().GetId(),
+                req.GetRequestType());
+        return result;
+    }
+
+    private BaseDataResponse<SecurityTokenEntity> BaseValidateAccessRequest(String token_id, RequestType reqType) {
+
+        SecurityTokenEntity tokenEntity = this.__tokenService.GetEntityByTokenId(token_id);
 
         if (tokenEntity == null) {
-            return new ErrorResponse("Cannot Validated Token!");
+            return new ErrorDataResponse<SecurityTokenEntity>(SessionErrorMessages.NotAuhenticated);
         }
-        // Role null geliyor!!
+
         Role role = this.__authorManager.GetRoleById(tokenEntity.getRole_id());
 
         // Authorization'a özel bussiness logic işlemleri.
-        return CoreSecurityAuthorizationLogic.ValidateAuthority(role, req.GetRequestType());
-
+        BaseResponse authorizationResults = CoreSecurityAuthorizationLogic.ValidateAuthority(role, reqType);
+        if (authorizationResults.GetSuccess()) {
+            return new SuccessDataResponse<SecurityTokenEntity>(SessionSuccessMessages.Authorized, tokenEntity);
+        }
+        return new ErrorDataResponse<SecurityTokenEntity>(SessionErrorMessages.NotAuthorized);
     }
 
 }

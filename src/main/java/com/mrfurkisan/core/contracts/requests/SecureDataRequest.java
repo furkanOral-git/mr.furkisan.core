@@ -16,4 +16,5 @@ public class SecureDataRequest<TData> extends BaseDataRequest<TData> {
     public ISecurityToken GetToken() {
         return this.__token;
     }
+    
 }

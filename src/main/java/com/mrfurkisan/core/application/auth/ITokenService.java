@@ -16,6 +16,4 @@ public interface ITokenService extends IApplicationService {
 
     public SecurityTokenEntity GetEntityByTokenId(String token);
 
-    public int ValidateTokenAndReturnUserId(String token);
-
 }

@@ -68,9 +68,6 @@ public final class TokenService<TRepository extends ITokenRepository> implements
         securityTokenEntity.setUnique_id(uuid);
         securityTokenEntity.setRole_id(roleId);
         securityTokenEntity.setUser_id(userId);
-        // CQRS kullanımı, veritabanı farklılıklarından dolayı işlemlerin de
-        // farklılaşması durumuna çözüm olarak kullanılabilir.
-        // Fakat ben şuanda kullanmıcam.
 
         if (this.__repository instanceof TokenInMemoryRepository) {
 
@@ -159,14 +156,4 @@ public final class TokenService<TRepository extends ITokenRepository> implements
         }
         return entity;
     }
-    @Override
-    public int ValidateTokenAndReturnUserId(String token) {
-
-        var tok = this.GetEntityByTokenId(token);
-        if (tok == null) {
-            return -1;
-        }
-        return tok.getUser_id();
-    }
-
 }
